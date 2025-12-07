@@ -6,7 +6,8 @@
   "scripts": {
     "generate": "node ./src/index.js",
     "start": "node ./src/index.js",
-    "generate:samples": "node ./src/scripts/generate-samples.js"
+    "generate:samples": "node ./src/scripts/generate-samples.js",
+    "start:web": "cd web && node server.js"
   },
   "keywords": ["resume", "cv", "pdf", "html", "generator"],
   "author": "",

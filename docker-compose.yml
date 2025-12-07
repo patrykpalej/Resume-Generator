@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  resume-generator-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: resume-generator-demo
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./web:/app/web
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./assets:/app/assets
+      - /app/node_modules
+      - /app/web/node_modules
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped

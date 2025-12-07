@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Generator Demo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <i class="fas fa-file-alt"></i>
+        <h1>Resume Generator</h1>
+      </div>
+
+      <div class="control-section editor-section">
+        <h3>Resume Data</h3>
+        <div class="button-group">
+          <button id="loadExampleBtn" class="btn btn-secondary">
+            <i class="fas fa-file-import"></i> Load Example
+          </button>
+          <label for="fileInput" class="btn btn-secondary file-btn">
+            <i class="fas fa-upload"></i> Upload JSON
+            <input type="file" id="fileInput" accept=".json" style="display: none;">
+          </label>
+        </div>
+
+        <div class="json-editor-container">
+          <div class="editor-header">
+            <span>JSON Editor</span>
+            <button id="validateBtn" class="btn-icon" title="Validate JSON">
+              <i class="fas fa-check-circle"></i>
+            </button>
+          </div>
+          <textarea id="jsonEditor" placeholder="Load example data or upload your JSON file..."></textarea>
+          <div id="jsonError" class="error-message"></div>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h3>Photo (Optional)</h3>
+        <label for="photoInput" class="btn btn-secondary file-btn">
+          <i class="fas fa-image"></i> Upload Photo
+          <input type="file" id="photoInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
+        </label>
+        <div id="photoStatus" class="status-message"></div>
+      </div>
+
+      <div class="control-section">
+        <h3>Appearance</h3>
+        <div class="form-group">
+          <label for="themeSelect">Theme</label>
+          <select id="themeSelect" class="select-input">
+            <option value="">Select theme...</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="colorGroup" style="display: none;">
+          <label for="colorSelect">Color</label>
+          <select id="colorSelect" class="select-input">
+            <option value="">Select color...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <button id="generateBtn" class="btn btn-primary" disabled>
+          <i class="fas fa-eye"></i> Generate Preview
+        </button>
+        <button id="exportPdfBtn" class="btn btn-success" disabled>
+          <i class="fas fa-file-pdf"></i> Export to PDF
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="preview-header">
+        <h2>Resume Preview</h2>
+        <div id="previewStatus" class="preview-status"></div>
+      </div>
+
+      <div class="preview-container" id="previewContainer">
+        <div class="preview-placeholder">
+          <i class="fas fa-file-alt"></i>
+          <p>Load data and select a theme to preview your resume</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
