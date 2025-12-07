@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resume Generator Demo</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- CodeMirror CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,53 +19,64 @@
         <h1>Resume Generator</h1>
       </div>
 
-      <div class="control-section editor-section">
+      <div class="control-section">
         <h3>Resume Data</h3>
-        <div class="button-group">
-          <button id="loadExampleBtn" class="btn btn-secondary">
-            <i class="fas fa-file-import"></i> Load Example
-          </button>
-          <label for="fileInput" class="btn btn-secondary file-btn">
-            <i class="fas fa-upload"></i> Upload JSON
-            <input type="file" id="fileInput" accept=".json" style="display: none;">
-          </label>
-        </div>
-
-        <div class="json-editor-container">
-          <div class="editor-header">
-            <span>JSON Editor</span>
-            <button id="validateBtn" class="btn-icon" title="Validate JSON">
-              <i class="fas fa-check-circle"></i>
+        <div class="button-group button-row">
+          <div class="button-with-label">
+            <span class="button-label">Standard</span>
+            <button id="loadExampleBtn" class="btn btn-secondary">
+              <i class="fas fa-file-import"></i> Load Template
             </button>
           </div>
-          <textarea id="jsonEditor" placeholder="Load example data or upload your JSON file..."></textarea>
-          <div id="jsonError" class="error-message"></div>
+          <div class="button-with-label">
+            <span class="button-label">Advanced</span>
+            <label for="fileInput" class="btn btn-secondary file-btn">
+              <i class="fas fa-upload"></i> Load from JSON
+              <input type="file" id="fileInput" accept=".json" style="display: none;">
+            </label>
+          </div>
+          <div class="photo-upload-wrapper">
+            <span class="optional-label">(Optional)</span>
+            <label for="photoInput" class="btn btn-secondary file-btn photo-upload-btn">
+              <span class="photo-label-main">
+                <i class="fas fa-image"></i>
+                Upload Photo
+              </span>
+              <input type="file" id="photoInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
+            </label>
+          </div>
+        </div>
+        <div id="dataStatus" class="status-message"></div>
+      </div>
+
+      <div class="control-section sections-panel" id="sectionsPanel">
+        <h3>
+          <i class="fas fa-list"></i> Resume Sections
+        </h3>
+        <p class="sections-hint">Click edit to modify each section. Drag to reorder. Toggle to enable/disable.</p>
+        <div id="sectionList" class="section-list">
+          <!-- Sections will be dynamically populated here -->
         </div>
       </div>
 
-      <div class="control-section">
-        <h3>Photo (Optional)</h3>
-        <label for="photoInput" class="btn btn-secondary file-btn">
-          <i class="fas fa-image"></i> Upload Photo
-          <input type="file" id="photoInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
-        </label>
-        <div id="photoStatus" class="status-message"></div>
-      </div>
+      <!-- Hidden textarea for internal JSON storage -->
+      <textarea id="jsonEditor" style="display: none;"></textarea>
+      <div id="jsonError" class="error-message"></div>
 
       <div class="control-section">
         <h3>Appearance</h3>
-        <div class="form-group">
-          <label for="themeSelect">Theme</label>
-          <select id="themeSelect" class="select-input">
-            <option value="">Select theme...</option>
-          </select>
-        </div>
+        <div class="appearance-grid">
+          <div class="form-group">
+            <label for="themeSelect">Theme</label>
+            <select id="themeSelect" class="select-input">
+            </select>
+          </div>
 
-        <div class="form-group" id="colorGroup" style="display: none;">
-          <label for="colorSelect">Color</label>
-          <select id="colorSelect" class="select-input">
-            <option value="">Select color...</option>
-          </select>
+          <div class="form-group" id="colorGroup" style="display: none;">
+            <label for="colorSelect">Color</label>
+            <select id="colorSelect" class="select-input">
+            </select>
+          </div>
         </div>
       </div>
 
@@ -70,9 +84,14 @@
         <button id="generateBtn" class="btn btn-primary" disabled>
           <i class="fas fa-eye"></i> Generate Preview
         </button>
-        <button id="exportPdfBtn" class="btn btn-success" disabled>
-          <i class="fas fa-file-pdf"></i> Export to PDF
-        </button>
+        <div class="export-row">
+          <button id="exportPdfBtn" class="btn btn-success" disabled>
+            <i class="fas fa-file-pdf"></i> Export to PDF
+          </button>
+          <button id="exportJsonBtn" class="btn btn-neutral" disabled>
+            <i class="fas fa-code"></i> Export JSON
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -92,6 +111,44 @@
     </main>
   </div>
 
+  <!-- Section Editor Modal -->
+  <div id="jsonEditorModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-code"></i>
+          <span id="modalSectionTitle">Edit Section</span>
+        </h2>
+        <button id="closeModalBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="expandedJsonEditor"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="formatJsonBtn" class="btn btn-secondary">
+          <i class="fas fa-align-left"></i> Format and Validate JSON
+        </button>
+        <div class="modal-actions">
+          <button id="cancelModalBtn" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button id="saveModalBtn" class="btn btn-primary">
+            <i class="fas fa-check"></i> Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CodeMirror JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/brace-fold.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
