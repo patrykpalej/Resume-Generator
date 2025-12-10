@@ -52,9 +52,9 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid var(--bg-tertiary);
+  padding-bottom: 4px;
   flex-shrink: 0;
+  flex-wrap: nowrap;
 }
 
 .logo i {
@@ -66,6 +66,61 @@ body {
   font-size: 22px;
   font-weight: 600;
   color: var(--text-primary);
+}
+
+.badge-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e6f4ea;
+  color: #1b6e2d;
+  border: 1px solid #a4d4b5;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.badge-link {
+  background: #e8f1fb;
+  color: #245fae;
+  border-color: #b3c8e8;
+  text-decoration: none;
+  padding: 6px 12px;
+}
+
+.badge-emoji {
+  font-size: 14px;
+}
+
+.logo-divider {
+  width: 100%;
+  height: 2px;
+  background: var(--bg-tertiary);
+  margin-top: 2px;
+}
+
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #245fae;
+  text-decoration: none;
+  padding: 4px 6px;
+  margin-left: auto;
+}
+
+.logo-link .logo-link-text {
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.logo-link:hover .logo-link-text {
+  border-bottom-color: currentColor;
 }
 
 .control-section {
