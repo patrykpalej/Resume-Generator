@@ -9,25 +9,41 @@
     "github": "github.com/alexsmith"
   },
   "summary": "Full-stack engineer who enjoys shipping reliable web applications and collaborating across teams.",
-  "skills": {
-    "Working knowledge": [
-      "JavaScript",
-      "TypeScript",
-      "React",
-      "Node.js",
-      "Express",
-      "SQL",
-      "REST APIs",
-      "Git",
-      "Linux"
-    ],
-    "Basic skills": [
-      "Docker",
-      "Cloud basics",
-      "Python",
-      "Testing (Jest, Playwright)"
-    ]
-  },
+  "skills": [
+    {
+      "name": "Working knowledge",
+      "fraction": 2.5,
+      "items": [
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "Node.js",
+        "Express",
+        "SQL",
+        "REST APIs",
+        "Git",
+        "Linux"
+      ]
+    },
+    {
+      "name": "Basic skills",
+      "fraction": 2,
+      "items": [
+        "Docker",
+        "Cloud basics",
+        "Python",
+        "Testing (Jest, Playwright)"
+      ]
+    },
+    {
+      "name": "Languages",
+      "fraction": 1,
+      "items": [
+        "English (C1)",
+        "Spanish (B2)"
+      ]
+    }
+  ],
   "experience": [
     {
       "position": "Software Engineer",
@@ -57,12 +73,14 @@
       "degree": "Computer Science",
       "level": "Master studies",
       "institution": "State University",
+      "startDate": "2017-10",
       "graduationDate": "2019-07"
     },
     {
       "degree": "Physics",
       "level": "Bachelor studies",
       "institution": "State University",
+      "startDate": "2014-10",
       "graduationDate": "2017-07"
     }
   ],

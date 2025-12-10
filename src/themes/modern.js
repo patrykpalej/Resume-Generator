@@ -29,12 +29,25 @@ function getStyles(palette) {
       color: #444;
     }
 
-    .project-name a {
+    .project-link-line {
+      font-size: 13px;
       color: ${palette.primary};
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    .project-link {
+      color: ${palette.primary};
+      transition: color 0.2s;
+    }
+
+    .project-link:hover {
+      color: ${palette.accent};
+      text-decoration: underline;
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
       line-height: 1.6;
       color: #1a1a1a;
       background: #fff;
@@ -80,7 +93,7 @@ function getStyles(palette) {
 
     h1 {
       font-size: 36px;
-      color: ${palette.primary};
+      color: #1a1a1a;
       margin-bottom: 5px;
       font-weight: 700;
       letter-spacing: -0.5px;
@@ -110,7 +123,7 @@ function getStyles(palette) {
 
     .contact-info i {
       width: 16px;
-      color: ${palette.primary};
+      color: ${palette.accent};
     }
 
     section {
@@ -123,7 +136,6 @@ function getStyles(palette) {
       border-bottom: none;
       padding-bottom: 8px;
       margin-bottom: 15px;
-      text-transform: uppercase;
       letter-spacing: 2px;
       font-weight: 700;
       position: relative;
@@ -159,7 +171,7 @@ function getStyles(palette) {
       border-left: 2px solid #e8e8e8;
     }
 
-    .experience-header, .education-header, .project-header {
+    .experience-header, .education-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
@@ -208,9 +220,10 @@ function getStyles(palette) {
     }
 
     .skills-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
+      display: flex;
+      flex-wrap: nowrap;
       gap: 15px;
+      width: 95%;
     }
 
     .skill-category {
@@ -219,6 +232,8 @@ function getStyles(palette) {
       border-radius: 8px;
       border-left: 4px solid ${palette.primary};
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+      min-width: 0;
     }
 
     .skill-category h3 {
@@ -244,6 +259,7 @@ function getStyles(palette) {
       border: 1px solid #d0d0d0;
       font-weight: 500;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      white-space: nowrap;
     }
 
     .projects-intro {

@@ -9,6 +9,24 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.css">
   <link rel="stylesheet" href="styles.css">
+  
+  <!-- Matomo -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//matomo.palej.dev/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '3']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+
+
 </head>
 <body>
   <div class="container">
@@ -23,23 +41,23 @@
         <h3>Resume Data</h3>
         <div class="button-group button-row">
           <div class="button-with-label">
-            <span class="button-label">Standard</span>
-            <button id="loadExampleBtn" class="btn btn-secondary">
+            <span class="button-label button-label-highlight">Start Here!</span>
+            <button id="loadExampleBtn" class="btn btn-primary">
               <i class="fas fa-file-import"></i> Load Template
             </button>
           </div>
           <div class="button-with-label">
-            <span class="button-label">Advanced</span>
+            <span class="button-label">Import your data</span>
             <label for="fileInput" class="btn btn-secondary file-btn">
               <i class="fas fa-upload"></i> Load from JSON
               <input type="file" id="fileInput" accept=".json" style="display: none;">
             </label>
           </div>
           <div class="photo-upload-wrapper">
-            <span class="optional-label">(Optional)</span>
+            <span class="button-label">Upload your photo (optional)</span>
             <label for="photoInput" class="btn btn-secondary file-btn photo-upload-btn">
               <span class="photo-label-main">
-                <i class="fas fa-image"></i>
+                <i class="fas fa-portrait"></i>
                 Upload Photo
               </span>
               <input type="file" id="photoInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
@@ -61,7 +79,6 @@
 
       <!-- Hidden textarea for internal JSON storage -->
       <textarea id="jsonEditor" style="display: none;"></textarea>
-      <div id="jsonError" class="error-message"></div>
 
       <div class="control-section">
         <h3>Appearance</h3>
@@ -81,12 +98,12 @@
       </div>
 
       <div class="control-section">
-        <button id="generateBtn" class="btn btn-primary" disabled>
-          <i class="fas fa-eye"></i> Generate Preview
-        </button>
         <div class="export-row">
+          <button id="previewPdfBtn" class="btn btn-info" disabled>
+            <i class="fas fa-eye"></i> View PDF Preview
+          </button>
           <button id="exportPdfBtn" class="btn btn-success" disabled>
-            <i class="fas fa-file-pdf"></i> Export to PDF
+            <i class="fas fa-file-pdf"></i> Export PDF
           </button>
           <button id="exportJsonBtn" class="btn btn-neutral" disabled>
             <i class="fas fa-code"></i> Export JSON
@@ -111,12 +128,414 @@
     </main>
   </div>
 
+  <!-- Projects Management Modal -->
+  <div id="projectsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <span id="projectsModalTitle">🚀 Projects</span>
+          <button class="btn-rename-section-modal" id="renameProjectsSectionBtn" title="Rename section">
+            <i class="fas fa-pen"></i>
+          </button>
+        </h2>
+        <button id="closeProjectsModalBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="projects-list-container">
+          <div id="projectsList" class="projects-list">
+            <!-- Projects will be populated here -->
+          </div>
+          <button id="addProjectBtn" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Project
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="closeProjectsModalFooterBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Form Modal -->
+  <div id="projectFormModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-project-diagram"></i>
+          <span id="projectFormTitle">Edit Project</span>
+        </h2>
+        <button id="closeProjectFormBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="projectFormError" class="modal-error-message"></div>
+        <form id="projectForm" class="experience-form">
+          <div class="form-field">
+            <label for="projectName">Project Name *</label>
+            <input type="text" id="projectName" required placeholder="e.g., Portfolio Website">
+          </div>
+          <div class="form-field">
+            <label for="projectDescription">Description *</label>
+            <textarea id="projectDescription" rows="3" required placeholder="Briefly describe what the project does"></textarea>
+          </div>
+          <div class="form-field">
+            <label for="projectTechnologies">Technologies (optional)</label>
+            <input type="text" id="projectTechnologies" placeholder="e.g., React, Node.js, PostgreSQL">
+          </div>
+          <div class="form-field">
+            <label for="projectLink">Project Link (optional)</label>
+            <input type="text" id="projectLink" placeholder="e.g., github.com/username/project">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelProjectFormBtn" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button id="saveProjectFormBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Experience Management Modal -->
+  <div id="experienceModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <span id="experienceModalTitle">💼 Experience</span>
+          <button class="btn-rename-section-modal" id="renameExperienceSectionBtn" title="Rename section">
+            <i class="fas fa-pen"></i>
+          </button>
+        </h2>
+        <button id="closeExperienceModalBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="experience-list-container">
+          <div id="experienceList" class="experience-list">
+            <!-- Experience items will be populated here -->
+          </div>
+          <button id="addExperienceBtn" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Experience
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="closeExperienceModalFooterBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Education Management Modal -->
+  <div id="educationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <span id="educationModalTitle">🎓 Education</span>
+          <button class="btn-rename-section-modal" id="renameEducationSectionBtn" title="Rename section">
+            <i class="fas fa-pen"></i>
+          </button>
+        </h2>
+        <button id="closeEducationModalBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="experience-list-container">
+          <div id="educationList" class="experience-list">
+            <!-- Education items will be populated here -->
+          </div>
+          <button id="addEducationBtn" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Education
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="closeEducationModalFooterBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Education Form Modal -->
+  <div id="educationFormModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <span id="educationFormTitle">Edit Education</span>
+        </h2>
+        <button id="closeEducationFormBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="educationFormError" class="modal-error-message"></div>
+        <form id="educationForm" class="experience-form">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="edDegree">Degree *</label>
+              <input type="text" id="edDegree" required placeholder="e.g., Computer Science">
+            </div>
+            <div class="form-field">
+              <label for="edLevel">Level *</label>
+              <input type="text" id="edLevel" required placeholder="e.g., Bachelor studies">
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="edInstitution">Institution *</label>
+            <input type="text" id="edInstitution" required placeholder="e.g., State University">
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="edStartDate">Start Date * (YYYY-MM)</label>
+              <input type="text" id="edStartDate" required placeholder="e.g., 2017-10" pattern="\d{4}-\d{2}" title="Please enter date in YYYY-MM format">
+            </div>
+            <div class="form-field">
+              <label for="edGraduationDate">Graduation Date (YYYY-MM)</label>
+              <input type="text" id="edGraduationDate" placeholder="e.g., 2019-07" pattern="\d{4}-\d{2}" title="Please enter date in YYYY-MM format">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelEducationFormBtn" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button id="saveEducationFormBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Experience Form Modal -->
+  <div id="experienceFormModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-briefcase"></i>
+          <span id="experienceFormTitle">Edit Experience</span>
+        </h2>
+        <button id="closeExperienceFormBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="experienceFormError" class="modal-error-message"></div>
+        <form id="experienceForm" class="experience-form">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="expPosition">Position *</label>
+              <input type="text" id="expPosition" required placeholder="e.g., Software Engineer">
+            </div>
+            <div class="form-field">
+              <label for="expCompany">Company *</label>
+              <input type="text" id="expCompany" required placeholder="e.g., Tech Corp">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="expStartDate">Start Date * (YYYY-MM)</label>
+              <input type="text" id="expStartDate" required placeholder="e.g., 2020-06" pattern="\d{4}-\d{2}" title="Please enter date in YYYY-MM format">
+            </div>
+            <div class="form-field">
+              <label for="expEndDate">End Date (YYYY-MM)</label>
+              <input type="text" id="expEndDate" placeholder="Leave blank if still working" pattern="\d{4}-\d{2}" title="Please enter date in YYYY-MM format">
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Responsibilities</label>
+            <div id="responsibilitiesList" class="responsibilities-list">
+              <!-- Responsibilities will be populated here -->
+            </div>
+            <button type="button" id="addResponsibilityBtn" class="btn btn-secondary btn-small">
+              <i class="fas fa-plus"></i> Add Responsibility
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelExperienceFormBtn" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button id="saveExperienceFormBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Personal Information Form Modal -->
+  <div id="personalInfoModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-user"></i>
+          <span>Personal Information</span>
+        </h2>
+        <button id="closePersonalInfoModalBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="personalInfoFormError" class="modal-error-message"></div>
+        <form id="personalInfoForm" class="personal-info-form">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="piName">Full Name *</label>
+              <input type="text" id="piName" required placeholder="e.g., John Smith">
+            </div>
+            <div class="form-field">
+              <label for="piTitle">Job Title</label>
+              <input type="text" id="piTitle" placeholder="e.g., Software Engineer">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="piEmail">Email</label>
+              <input type="email" id="piEmail" placeholder="e.g., john@example.com">
+            </div>
+            <div class="form-field">
+              <label for="piPhone">Phone</label>
+              <input type="text" id="piPhone" placeholder="e.g., +1 555-123-4567">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="piWebsite">Website</label>
+              <input type="text" id="piWebsite" placeholder="e.g., johnsmith.dev (without https://)">
+            </div>
+            <div class="form-field">
+              <label for="piLinkedin">LinkedIn</label>
+              <input type="text" id="piLinkedin" placeholder="e.g., linkedin.com/in/johnsmith">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="piGithub">GitHub</label>
+              <input type="text" id="piGithub" placeholder="e.g., github.com/johnsmith">
+            </div>
+            <div class="form-field">
+              <!-- Empty for layout balance -->
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelPersonalInfoBtn" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button id="savePersonalInfoBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Editor Modal -->
+  <div id="summaryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-align-left"></i>
+          <span>Summary</span>
+        </h2>
+        <button id="closeSummaryModalBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="summaryFormError" class="modal-error-message"></div>
+        <div class="summary-editor-container">
+          <label for="summaryTextarea">Write a brief professional summary about yourself:</label>
+          <textarea id="summaryTextarea" class="summary-textarea" placeholder="e.g., Experienced software engineer with 5+ years of expertise in full-stack development..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelSummaryBtn" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button id="saveSummaryBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GDPR Clause Editor Modal -->
+  <div id="gdprModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-shield-alt"></i>
+          <span>GDPR Clause</span>
+        </h2>
+        <button id="closeGdprModalBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="gdprFormError" class="modal-error-message"></div>
+        <div class="summary-editor-container">
+          <label for="gdprTextarea">Enter the GDPR consent clause to include at the bottom of your resume:</label>
+          <textarea id="gdprTextarea" class="summary-textarea" placeholder="e.g., I consent to the processing of my personal data for recruitment purposes in accordance with GDPR."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelGdprBtn" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button id="saveGdprBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF Preview Modal -->
+  <div id="pdfPreviewModal" class="modal pdf-preview-modal">
+    <div class="modal-content pdf-preview-content">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-file-pdf"></i>
+          <span>PDF Preview</span>
+        </h2>
+        <button id="closePdfPreviewBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body pdf-preview-body">
+        <div id="pdfPreviewContainer" class="pdf-preview-iframe-container">
+          <!-- PDF preview iframe will be inserted here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Section Editor Modal -->
   <div id="jsonEditorModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2>
-          <i class="fas fa-code"></i>
+          <i id="modalSectionIcon" class="fas fa-code"></i>
           <span id="modalSectionTitle">Edit Section</span>
         </h2>
         <button id="closeModalBtn" class="btn-icon modal-close" title="Close">

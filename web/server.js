@@ -56,7 +56,7 @@ app.get('/api/example-data', async (req, res) => {
 // API endpoint to generate HTML preview
 app.post('/api/generate', async (req, res) => {
   try {
-    const { resumeData, themeName, colorName, photoBase64 } = req.body;
+    const { resumeData, themeName, colorName, photoBase64, customSectionNames } = req.body;
 
     if (!resumeData) {
       return res.status(400).json({ error: 'Resume data is required' });
@@ -77,7 +77,7 @@ app.post('/api/generate', async (req, res) => {
       palette = color.palette;
     }
 
-    const htmlContent = generateHTML(resumeData, photoBase64, theme, palette);
+    const htmlContent = generateHTML(resumeData, photoBase64, theme, palette, customSectionNames);
     res.json({ html: htmlContent });
   } catch (error) {
     console.error('Error generating HTML:', error);
@@ -88,7 +88,7 @@ app.post('/api/generate', async (req, res) => {
 // API endpoint to export PDF
 app.post('/api/export-pdf', async (req, res) => {
   try {
-    const { resumeData, themeName, colorName, photoBase64 } = req.body;
+    const { resumeData, themeName, colorName, photoBase64, customSectionNames } = req.body;
 
     if (!resumeData) {
       return res.status(400).json({ error: 'Resume data is required' });
@@ -109,7 +109,7 @@ app.post('/api/export-pdf', async (req, res) => {
       palette = color.palette;
     }
 
-    const htmlContent = generateHTML(resumeData, photoBase64, theme, palette);
+    const htmlContent = generateHTML(resumeData, photoBase64, theme, palette, customSectionNames);
 
     // Generate temporary PDF file
     const tempPdfPath = path.join(__dirname, 'temp', `resume_${Date.now()}.pdf`);

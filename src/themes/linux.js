@@ -25,16 +25,25 @@ function getStyles(palette) {
       text-decoration: underline;
     }
 
-    .contact-info a {
-      color: ${palette.accent};
+    .project-link-line {
+      font-size: 13px;
+      color: ${palette.primary};
+      font-style: normal;
+      font-weight: 400;
     }
 
-    .project-name a {
+    .project-link {
       color: ${palette.primary};
+      transition: color 0.2s;
+    }
+
+    .project-link:hover {
+      color: ${palette.accent};
+      text-decoration: underline;
     }
 
     body {
-      font-family: 'Courier New', 'Liberation Mono', 'Consolas', monospace;
+      font-family: 'Courier New', 'Liberation Mono', 'Consolas', monospace, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
       line-height: 1.6;
       color: ${palette.primary};
       background: #fff;
@@ -77,7 +86,7 @@ function getStyles(palette) {
 
     h1 {
       font-size: 36px;
-      color: ${palette.primary};
+      color: #1a1a1a;
       margin-bottom: 5px;
       font-weight: 700;
     }
@@ -116,9 +125,17 @@ function getStyles(palette) {
       white-space: nowrap;
     }
 
+    .contact-info a {
+      color: #333;
+    }
+
+    .contact-info a:hover {
+      color: #000;
+    }
+
     .contact-info i {
       width: 16px;
-      color: ${palette.primary};
+      color: ${palette.accent};
     }
 
     section {
@@ -131,7 +148,6 @@ function getStyles(palette) {
       border-bottom: 1px solid ${palette.primary};
       padding-bottom: 8px;
       margin-bottom: 15px;
-      text-transform: uppercase;
       letter-spacing: 1px;
       font-weight: 700;
       page-break-after: avoid;
@@ -159,7 +175,7 @@ function getStyles(palette) {
       page-break-inside: avoid;
     }
 
-    .experience-header, .education-header, .project-header {
+    .experience-header, .education-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
@@ -230,9 +246,10 @@ function getStyles(palette) {
     }
 
     .skills-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
+      display: flex;
+      flex-wrap: nowrap;
       gap: 15px;
+      width: 95%;
     }
 
     .skill-category {
@@ -240,6 +257,8 @@ function getStyles(palette) {
       padding: 15px;
       border-radius: 0;
       border: 1px dashed ${palette.primary};
+      flex-shrink: 0;
+      min-width: 0;
     }
 
     .skill-category h3 {
@@ -268,6 +287,7 @@ function getStyles(palette) {
       font-size: 13px;
       color: #333;
       border: 1px solid ${palette.primary};
+      white-space: nowrap;
     }
 
     .projects-intro {

@@ -29,12 +29,24 @@ function getStyles(palette) {
       color: #555;
     }
 
-    .project-name a {
+    .project-link-line {
+      font-size: 13px;
       color: ${palette.primary};
+      font-style: italic;
+    }
+
+    .project-link {
+      color: ${palette.primary};
+      transition: color 0.2s;
+    }
+
+    .project-link:hover {
+      color: ${palette.accent};
+      text-decoration: underline;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
       line-height: 1.6;
       color: #333;
       background: #fff;
@@ -77,7 +89,7 @@ function getStyles(palette) {
 
     h1 {
       font-size: 36px;
-      color: ${palette.primary};
+      color: #1a1a1a;
       margin-bottom: 5px;
     }
 
@@ -117,7 +129,6 @@ function getStyles(palette) {
       border-bottom: 2px solid #ecf0f1;
       padding-bottom: 8px;
       margin-bottom: 15px;
-      text-transform: uppercase;
       letter-spacing: 1px;
       page-break-after: avoid;
       page-break-inside: avoid;
@@ -137,7 +148,7 @@ function getStyles(palette) {
       page-break-inside: avoid;
     }
 
-    .experience-header, .education-header, .project-header {
+    .experience-header, .education-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
@@ -181,9 +192,10 @@ function getStyles(palette) {
     }
 
     .skills-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
+      display: flex;
+      flex-wrap: nowrap;
       gap: 15px;
+      width: 95%;
     }
 
     .skill-category {
@@ -191,6 +203,8 @@ function getStyles(palette) {
       padding: 15px;
       border-radius: 5px;
       border-left: 4px solid ${palette.accent};
+      flex-shrink: 0;
+      min-width: 0;
     }
 
     .skill-category h3 {
@@ -213,6 +227,7 @@ function getStyles(palette) {
       font-size: 13px;
       color: #555;
       border: 1px solid #e0e0e0;
+      white-space: nowrap;
     }
 
     .projects-intro {

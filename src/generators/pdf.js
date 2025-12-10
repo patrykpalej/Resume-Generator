@@ -8,7 +8,19 @@ async function generatePDF(htmlContent, outputPath) {
 
   try {
     const page = await browser.newPage();
+
+    // Set viewport to match A4 dimensions for consistent rendering
+    // A4 at 96 DPI: 794px x 1123px
+    await page.setViewport({
+      width: 794,
+      height: 1123,
+      deviceScaleFactor: 2 // Higher resolution for better text rendering
+    });
+
     await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+    // Wait for fonts to load completely
+    await page.evaluateHandle('document.fonts.ready');
 
     // Position GDPR at absolute bottom of page 2
     await page.evaluate(() => {

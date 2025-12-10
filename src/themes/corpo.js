@@ -29,12 +29,25 @@ function getStyles(palette) {
       color: #444;
     }
 
-    .project-name a {
+    .project-link-line {
+      font-size: 13px;
       color: ${palette.primary};
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    .project-link {
+      color: ${palette.primary};
+      transition: color 0.2s;
+    }
+
+    .project-link:hover {
+      color: ${palette.accent};
+      text-decoration: underline;
     }
 
     body {
-      font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+      font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
       line-height: 1.6;
       color: #222;
       background: #fff;
@@ -77,7 +90,7 @@ function getStyles(palette) {
 
     h1 {
       font-size: 36px;
-      color: ${palette.primary};
+      color: #1a1a1a;
       margin-bottom: 5px;
       font-weight: 700;
       text-transform: uppercase;
@@ -124,7 +137,6 @@ function getStyles(palette) {
       padding: 6px 15px;
       padding-bottom: 8px;
       margin-bottom: 15px;
-      text-transform: uppercase;
       letter-spacing: 2px;
       font-weight: 600;
       page-break-after: avoid;
@@ -147,7 +159,7 @@ function getStyles(palette) {
       border-left: 3px solid ${palette.accent};
     }
 
-    .experience-header, .education-header, .project-header {
+    .experience-header, .education-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
@@ -193,9 +205,10 @@ function getStyles(palette) {
     }
 
     .skills-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
+      display: flex;
+      flex-wrap: nowrap;
       gap: 15px;
+      width: 95%;
     }
 
     .skill-category {
@@ -203,6 +216,8 @@ function getStyles(palette) {
       padding: 15px;
       border-radius: 0;
       border-left: 4px solid ${palette.accent};
+      flex-shrink: 0;
+      min-width: 0;
     }
 
     .skill-category h3 {
@@ -228,6 +243,7 @@ function getStyles(palette) {
       color: #333;
       border: 1px solid #ddd;
       font-weight: 500;
+      white-space: nowrap;
     }
 
     .projects-intro {

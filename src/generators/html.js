@@ -1,14 +1,16 @@
 function formatDate(dateStr) {
   if (!dateStr) return 'Present';
   const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${month}.${year}`;
 }
 
-function generateExperienceSection(experience) {
+function generateExperienceSection(experience, sectionName = '💼 Experience') {
   if (!experience || experience.length === 0) return '';
   return `
   <section>
-    <h2>Experience</h2>
+    <h2>${sectionName}</h2>
     ${experience.map(exp => `
       <div class="experience-item">
         <div class="experience-header">
@@ -30,56 +32,77 @@ function generateExperienceSection(experience) {
   </section>`;
 }
 
-function generateEducationSection(education) {
+function generateEducationSection(education, sectionName = '🎓 Education') {
   if (!education || education.length === 0) return '';
   return `
   <section>
-    <h2>Education</h2>
-    ${education.map(edu => `
+    <h2>${sectionName}</h2>
+    ${education.map(edu => {
+      // Format date range: show "startDate - graduationDate" if startDate exists, otherwise just graduationDate
+      const dateDisplay = edu.startDate
+        ? `${formatDate(edu.startDate)} - ${formatDate(edu.graduationDate)}`
+        : formatDate(edu.graduationDate);
+
+      return `
       <div class="education-item">
         <div class="education-header">
           <div>
             <div class="degree">${edu.degree}${edu.level ? ` <span class="education-level">(${edu.level})</span>` : ''}</div>
             <div class="institution">${edu.institution}</div>
           </div>
-          <div class="date-location">${formatDate(edu.graduationDate)}</div>
+          <div class="date-location">${dateDisplay}</div>
         </div>
       </div>
-    `).join('')}
+      `;
+    }).join('')}
   </section>`;
 }
 
-function generateSkillsSection(skills) {
-  if (!skills) return '';
+function generateSkillsSection(skills, sectionName = '💡 Skills') {
+  if (!skills || !Array.isArray(skills) || skills.length === 0) return '';
+
+  // Limit to maximum 3 categories
+  const limitedSkills = skills.slice(0, 3);
+
+  // Calculate total fraction sum
+  const totalFraction = limitedSkills.reduce((sum, category) => sum + (category.fraction || 1), 0);
+
   return `
   <section>
-    <h2>Skills</h2>
+    <h2>${sectionName}</h2>
     <div class="skills-grid">
-      ${Object.entries(skills).map(([category, items]) => `
-        <div class="skill-category">
-          <h3>${category}</h3>
+      ${limitedSkills.map(category => {
+        const fraction = category.fraction || 1;
+        const percentage = (fraction / totalFraction * 100).toFixed(2);
+        return `
+        <div class="skill-category" style="flex-basis: ${percentage}%; max-width: ${percentage}%;">
+          <h3>${category.name}</h3>
           <div class="skill-tags">
-            ${items.map(item => `<span class="skill-tag">${item}</span>`).join('')}
+            ${category.items.map(item => `<span class="skill-tag">${item}</span>`).join('')}
           </div>
         </div>
-      `).join('')}
+        `;
+      }).join('')}
     </div>
   </section>`;
 }
 
-function generateProjectsSection(projects, projectsIntro) {
+function generateProjectsSection(projects, projectsIntro, sectionName = '🚀 Projects') {
   if (!projects || projects.length === 0) return '';
   return `
   <section>
-    <h2>Hobby Projects</h2>
+    <h2>${sectionName}</h2>
     ${projectsIntro ? `<p class="projects-intro">${projectsIntro.text} <a href="${projectsIntro.link}" target="_blank">${projectsIntro.linkText}</a></p>` : ''}
     <div class="projects-grid">
       ${projects.map(project => `
         <div class="project-item">
-          <div class="project-name">${project.link ? `<a href="${project.link}" target="_blank">${project.name}</a>` : project.name}</div>
+          <div class="project-name">${project.name}</div>
           <p class="project-description">${project.description}</p>
-          ${project.technologies ? `
+          ${project.technologies && project.technologies.length > 0 ? `
             <div class="technologies">Technologies: ${project.technologies.join(', ')}</div>
+          ` : ''}
+          ${project.link ? `
+            <div class="project-link-line">Link: <a href="${normalizeUrl(project.link)}" target="_blank" rel="noopener noreferrer" class="project-link" title="View project">${project.link} <i class="fas fa-external-link-alt"></i></a></div>
           ` : ''}
         </div>
       `).join('')}
@@ -87,7 +110,16 @@ function generateProjectsSection(projects, projectsIntro) {
   </section>`;
 }
 
-function generateHTML(resumeData, photoBase64 = null, theme, colorPalette) {
+function normalizeUrl(url) {
+  if (!url) return '';
+  // If protocol already present, return as is
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(url)) {
+    return url;
+  }
+  return `https://${url}`;
+}
+
+function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, customSectionNames = {}) {
   if (!theme) {
     throw new Error('Theme is required to generate HTML.');
   }
@@ -96,6 +128,20 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette) {
   // Load theme styles
   const paletteToUse = theme.monochromatic ? undefined : colorPalette;
   const themeStyles = theme.getStyles(paletteToUse);
+
+  // Helper to get section display name
+  const getSectionName = (sectionKey) => {
+    if (customSectionNames && customSectionNames[sectionKey]) {
+      return customSectionNames[sectionKey];
+    }
+    const defaultNames = {
+      experience: '💼 Experience',
+      education: '🎓 Education',
+      skills: '💡 Skills',
+      projects: '🚀 Projects'
+    };
+    return defaultNames[sectionKey] || sectionKey;
+  };
 
   // Map section names to their generator functions
   const sectionGenerators = {
@@ -109,10 +155,11 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette) {
   const sections = Object.keys(resumeData)
     .filter(key => key !== 'personalInfo' && key !== 'summary' && key !== 'projectsIntro' && sectionGenerators[key])
     .map(key => {
+      const sectionName = getSectionName(key);
       if (key === 'projects') {
-        return sectionGenerators[key](resumeData[key], resumeData.projectsIntro);
+        return sectionGenerators[key](resumeData[key], resumeData.projectsIntro, sectionName);
       }
-      return sectionGenerators[key](resumeData[key]);
+      return sectionGenerators[key](resumeData[key], sectionName);
     })
     .join('\n');
 
@@ -123,6 +170,9 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${personalInfo.name} - Resume</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji">
   <style>${themeStyles}</style>
 </head>
 <body>
@@ -130,7 +180,7 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette) {
     <header>
       <div class="header-content">
         <h1>${personalInfo.name}</h1>
-        <div class="title">${personalInfo.title}</div>
+        ${personalInfo.title ? `<div class="title">${personalInfo.title}</div>` : ''}
         <div class="contact-info">
           ${personalInfo.email ? `<span><i class="fas fa-envelope"></i><a href="mailto:${personalInfo.email}">${personalInfo.email}</a></span>` : ''}
           ${personalInfo.phone ? `<span><i class="fas fa-phone"></i><a href="tel:${personalInfo.phone}">${personalInfo.phone}</a></span>` : ''}

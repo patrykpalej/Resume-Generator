@@ -20,13 +20,24 @@ function getStyles() {
       color: #333;
     }
 
-    .project-name a {
-      color: #1a1a1a;
+    .project-link-line {
+      font-size: 13px;
+      color: #000;
+      font-style: italic;
+    }
+
+    .project-link {
+      color: #000;
+      transition: color 0.2s;
+    }
+
+    .project-link:hover {
+      color: #555;
       text-decoration: underline;
     }
 
     body {
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', 'Times New Roman', serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
       line-height: 1.6;
       color: #1a1a1a;
       background: #fff;
@@ -114,7 +125,6 @@ function getStyles() {
       border-bottom: 1px solid #1a1a1a;
       padding-bottom: 8px;
       margin-bottom: 15px;
-      text-transform: uppercase;
       letter-spacing: 2px;
       font-weight: 700;
       page-break-after: avoid;
@@ -135,7 +145,7 @@ function getStyles() {
       page-break-inside: avoid;
     }
 
-    .experience-header, .education-header, .project-header {
+    .experience-header, .education-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
@@ -182,9 +192,10 @@ function getStyles() {
     }
 
     .skills-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
+      display: flex;
+      flex-wrap: nowrap;
       gap: 15px;
+      width: 95%;
     }
 
     .skill-category {
@@ -195,6 +206,8 @@ function getStyles() {
       border-top: 1px solid #e0e0e0;
       border-right: 1px solid #e0e0e0;
       border-bottom: 1px solid #e0e0e0;
+      flex-shrink: 0;
+      min-width: 0;
     }
 
     .skill-category h3 {
@@ -219,6 +232,7 @@ function getStyles() {
       color: #333;
       border: 1px solid #1a1a1a;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      white-space: nowrap;
     }
 
     .projects-intro {

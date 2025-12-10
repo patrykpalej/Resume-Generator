@@ -7,10 +7,13 @@ const state = {
   selectedTheme: null,
   selectedColor: null,
   currentHtml: null,
+  pdfPreviewUrl: null,
   codeMirrorEditor: null,
   jsonModified: false,
   enabledSections: {}, // Tracks which sections are enabled/disabled
-  currentEditingSection: null // Which section is being edited in modal
+  currentEditingSection: null, // Which section is being edited in modal
+  sectionErrors: {}, // Tracks which sections have JSON errors
+  customSectionNames: {} // Tracks custom section names (e.g., "experience" -> "Work History")
 };
 
 // Section configuration
@@ -22,14 +25,16 @@ const REORDERABLE_SECTIONS = ['skills', 'experience', 'education', 'projects']; 
 // DOM Elements
 const elements = {
   jsonEditor: document.getElementById('jsonEditor'),
-  jsonError: document.getElementById('jsonError'),
   themeSelect: document.getElementById('themeSelect'),
   colorSelect: document.getElementById('colorSelect'),
   colorGroup: document.getElementById('colorGroup'),
-  generateBtn: document.getElementById('generateBtn'),
+  previewPdfBtn: document.getElementById('previewPdfBtn'),
   exportPdfBtn: document.getElementById('exportPdfBtn'),
   exportJsonBtn: document.getElementById('exportJsonBtn'),
   loadExampleBtn: document.getElementById('loadExampleBtn'),
+  pdfPreviewModal: document.getElementById('pdfPreviewModal'),
+  pdfPreviewContainer: document.getElementById('pdfPreviewContainer'),
+  closePdfPreviewBtn: document.getElementById('closePdfPreviewBtn'),
   fileInput: document.getElementById('fileInput'),
   photoInput: document.getElementById('photoInput'),
   previewContainer: document.getElementById('previewContainer'),
@@ -42,7 +47,90 @@ const elements = {
   formatJsonBtn: document.getElementById('formatJsonBtn'),
   modalSectionTitle: document.getElementById('modalSectionTitle'),
   sectionsPanel: document.getElementById('sectionsPanel'),
-  sectionList: document.getElementById('sectionList')
+  sectionList: document.getElementById('sectionList'),
+  projectsModal: document.getElementById('projectsModal'),
+  projectsList: document.getElementById('projectsList'),
+  addProjectBtn: document.getElementById('addProjectBtn'),
+  closeProjectsModalBtn: document.getElementById('closeProjectsModalBtn'),
+  closeProjectsModalFooterBtn: document.getElementById('closeProjectsModalFooterBtn'),
+  projectFormModal: document.getElementById('projectFormModal'),
+  projectFormTitle: document.getElementById('projectFormTitle'),
+  projectForm: document.getElementById('projectForm'),
+  projectFormError: document.getElementById('projectFormError'),
+  projectName: document.getElementById('projectName'),
+  projectDescription: document.getElementById('projectDescription'),
+  projectTechnologies: document.getElementById('projectTechnologies'),
+  projectLink: document.getElementById('projectLink'),
+  closeProjectFormBtn: document.getElementById('closeProjectFormBtn'),
+  cancelProjectFormBtn: document.getElementById('cancelProjectFormBtn'),
+  saveProjectFormBtn: document.getElementById('saveProjectFormBtn'),
+  experienceModal: document.getElementById('experienceModal'),
+  experienceList: document.getElementById('experienceList'),
+  addExperienceBtn: document.getElementById('addExperienceBtn'),
+  closeExperienceModalBtn: document.getElementById('closeExperienceModalBtn'),
+  closeExperienceModalFooterBtn: document.getElementById('closeExperienceModalFooterBtn'),
+  experienceFormModal: document.getElementById('experienceFormModal'),
+  experienceFormTitle: document.getElementById('experienceFormTitle'),
+  experienceForm: document.getElementById('experienceForm'),
+  experienceFormError: document.getElementById('experienceFormError'),
+  expPosition: document.getElementById('expPosition'),
+  expCompany: document.getElementById('expCompany'),
+  expStartDate: document.getElementById('expStartDate'),
+  expEndDate: document.getElementById('expEndDate'),
+  responsibilitiesList: document.getElementById('responsibilitiesList'),
+  addResponsibilityBtn: document.getElementById('addResponsibilityBtn'),
+  closeExperienceFormBtn: document.getElementById('closeExperienceFormBtn'),
+  cancelExperienceFormBtn: document.getElementById('cancelExperienceFormBtn'),
+  saveExperienceFormBtn: document.getElementById('saveExperienceFormBtn'),
+  // Education Modal
+  educationModal: document.getElementById('educationModal'),
+  educationList: document.getElementById('educationList'),
+  addEducationBtn: document.getElementById('addEducationBtn'),
+  closeEducationModalBtn: document.getElementById('closeEducationModalBtn'),
+  closeEducationModalFooterBtn: document.getElementById('closeEducationModalFooterBtn'),
+  renameEducationSectionBtn: document.getElementById('renameEducationSectionBtn'),
+  educationFormModal: document.getElementById('educationFormModal'),
+  educationFormTitle: document.getElementById('educationFormTitle'),
+  educationForm: document.getElementById('educationForm'),
+  educationFormError: document.getElementById('educationFormError'),
+  edDegree: document.getElementById('edDegree'),
+  edLevel: document.getElementById('edLevel'),
+  edInstitution: document.getElementById('edInstitution'),
+  edStartDate: document.getElementById('edStartDate'),
+  edGraduationDate: document.getElementById('edGraduationDate'),
+  closeEducationFormBtn: document.getElementById('closeEducationFormBtn'),
+  cancelEducationFormBtn: document.getElementById('cancelEducationFormBtn'),
+  saveEducationFormBtn: document.getElementById('saveEducationFormBtn'),
+  // Personal Info Modal
+  personalInfoModal: document.getElementById('personalInfoModal'),
+  personalInfoForm: document.getElementById('personalInfoForm'),
+  personalInfoFormError: document.getElementById('personalInfoFormError'),
+  closePersonalInfoModalBtn: document.getElementById('closePersonalInfoModalBtn'),
+  cancelPersonalInfoBtn: document.getElementById('cancelPersonalInfoBtn'),
+  savePersonalInfoBtn: document.getElementById('savePersonalInfoBtn'),
+  piName: document.getElementById('piName'),
+  piTitle: document.getElementById('piTitle'),
+  piEmail: document.getElementById('piEmail'),
+  piPhone: document.getElementById('piPhone'),
+  piWebsite: document.getElementById('piWebsite'),
+  piLinkedin: document.getElementById('piLinkedin'),
+  piGithub: document.getElementById('piGithub'),
+  // Summary Modal
+  summaryModal: document.getElementById('summaryModal'),
+  summaryTextarea: document.getElementById('summaryTextarea'),
+  summaryFormError: document.getElementById('summaryFormError'),
+  closeSummaryModalBtn: document.getElementById('closeSummaryModalBtn'),
+  cancelSummaryBtn: document.getElementById('cancelSummaryBtn'),
+  saveSummaryBtn: document.getElementById('saveSummaryBtn'),
+  // GDPR Modal
+  gdprModal: document.getElementById('gdprModal'),
+  gdprTextarea: document.getElementById('gdprTextarea'),
+  gdprFormError: document.getElementById('gdprFormError'),
+  closeGdprModalBtn: document.getElementById('closeGdprModalBtn'),
+  cancelGdprBtn: document.getElementById('cancelGdprBtn'),
+  saveGdprBtn: document.getElementById('saveGdprBtn'),
+  // Modal section icon
+  modalSectionIcon: document.getElementById('modalSectionIcon')
 };
 
 // Initialize app
@@ -137,15 +225,67 @@ function setupEventListeners() {
   elements.photoInput.addEventListener('change', handlePhotoUpload);
   elements.themeSelect.addEventListener('change', handleThemeChange);
   elements.colorSelect.addEventListener('change', handleColorChange);
-  elements.generateBtn.addEventListener('click', generatePreview);
+  elements.previewPdfBtn.addEventListener('click', showPdfPreview);
   elements.exportPdfBtn.addEventListener('click', exportToPdf);
   elements.exportJsonBtn.addEventListener('click', exportToJson);
+  elements.closePdfPreviewBtn.addEventListener('click', closePdfPreview);
 
   // Modal event listeners
   elements.closeModalBtn.addEventListener('click', closeEditorModal);
   elements.cancelModalBtn.addEventListener('click', closeEditorModal);
   elements.saveModalBtn.addEventListener('click', saveEditorChanges);
   elements.formatJsonBtn.addEventListener('click', formatExpandedJson);
+
+  // Projects modal event listeners
+  elements.closeProjectsModalBtn.addEventListener('click', closeProjectsManagementModal);
+  elements.closeProjectsModalFooterBtn.addEventListener('click', closeProjectsManagementModal);
+  elements.addProjectBtn.addEventListener('click', addNewProject);
+  // Note: renameProjectsSectionBtn listener is attached dynamically when modal opens
+
+  // Project form modal event listeners
+  elements.closeProjectFormBtn.addEventListener('click', closeProjectFormModal);
+  elements.cancelProjectFormBtn.addEventListener('click', closeProjectFormModal);
+  elements.saveProjectFormBtn.addEventListener('click', saveProjectForm);
+
+  // Experience modal event listeners
+  elements.closeExperienceModalBtn.addEventListener('click', closeExperienceManagementModal);
+  elements.closeExperienceModalFooterBtn.addEventListener('click', closeExperienceManagementModal);
+  elements.addExperienceBtn.addEventListener('click', addNewExperience);
+  // Note: renameExperienceSectionBtn listener is attached dynamically when modal opens
+
+  // Experience form modal event listeners
+  elements.closeExperienceFormBtn.addEventListener('click', closeExperienceFormModal);
+  elements.cancelExperienceFormBtn.addEventListener('click', closeExperienceFormModal);
+  elements.saveExperienceFormBtn.addEventListener('click', saveExperienceForm);
+  elements.addResponsibilityBtn.addEventListener('click', () => addResponsibilityField());
+
+  // Education modal event listeners
+  elements.closeEducationModalBtn.addEventListener('click', closeEducationManagementModal);
+  elements.closeEducationModalFooterBtn.addEventListener('click', closeEducationManagementModal);
+  elements.addEducationBtn.addEventListener('click', addNewEducation);
+  if (elements.renameEducationSectionBtn) {
+    elements.renameEducationSectionBtn.addEventListener('click', () => renameSectionPrompt('education'));
+  }
+
+  // Education form modal event listeners
+  elements.closeEducationFormBtn.addEventListener('click', closeEducationFormModal);
+  elements.cancelEducationFormBtn.addEventListener('click', closeEducationFormModal);
+  elements.saveEducationFormBtn.addEventListener('click', saveEducationForm);
+
+  // Personal info modal event listeners
+  elements.closePersonalInfoModalBtn.addEventListener('click', closePersonalInfoModal);
+  elements.cancelPersonalInfoBtn.addEventListener('click', closePersonalInfoModal);
+  elements.savePersonalInfoBtn.addEventListener('click', savePersonalInfoForm);
+
+  // Summary modal event listeners
+  elements.closeSummaryModalBtn.addEventListener('click', closeSummaryModal);
+  elements.cancelSummaryBtn.addEventListener('click', closeSummaryModal);
+  elements.saveSummaryBtn.addEventListener('click', saveSummaryForm);
+
+  // GDPR modal event listeners
+  elements.closeGdprModalBtn.addEventListener('click', closeGdprModal);
+  elements.cancelGdprBtn.addEventListener('click', closeGdprModal);
+  elements.saveGdprBtn.addEventListener('click', saveGdprForm);
 
   // Close modal when clicking outside
   elements.jsonEditorModal.addEventListener('click', (e) => {
@@ -154,10 +294,109 @@ function setupEventListeners() {
     }
   });
 
+  elements.projectsModal.addEventListener('click', (e) => {
+    if (e.target === elements.projectsModal) {
+      closeProjectsManagementModal();
+    }
+  });
+
+  elements.projectFormModal.addEventListener('click', (e) => {
+    if (e.target === elements.projectFormModal) {
+      closeProjectFormModal();
+    }
+  });
+
+  elements.experienceModal.addEventListener('click', (e) => {
+    if (e.target === elements.experienceModal) {
+      closeExperienceManagementModal();
+    }
+  });
+
+  elements.educationModal.addEventListener('click', (e) => {
+    if (e.target === elements.educationModal) {
+      closeEducationManagementModal();
+    }
+  });
+
+  elements.educationFormModal.addEventListener('click', (e) => {
+    if (e.target === elements.educationFormModal) {
+      closeEducationFormModal();
+    }
+  });
+
+  // Keep experience badges positioned on scroll
+  elements.experienceList.addEventListener('scroll', () => {
+    // Use rAF to avoid thrashing layout
+    requestAnimationFrame(renderExperienceBadges);
+  });
+
+  if (elements.educationList) {
+    elements.educationList.addEventListener('scroll', () => {
+      requestAnimationFrame(renderEducationBadges);
+    });
+  }
+
+  elements.experienceFormModal.addEventListener('click', (e) => {
+    if (e.target === elements.experienceFormModal) {
+      closeExperienceFormModal();
+    }
+  });
+
+  elements.personalInfoModal.addEventListener('click', (e) => {
+    if (e.target === elements.personalInfoModal) {
+      closePersonalInfoModal();
+    }
+  });
+
+  elements.summaryModal.addEventListener('click', (e) => {
+    if (e.target === elements.summaryModal) {
+      closeSummaryModal();
+    }
+  });
+
+  elements.gdprModal.addEventListener('click', (e) => {
+    if (e.target === elements.gdprModal) {
+      closeGdprModal();
+    }
+  });
+
   // Close modal with Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && elements.jsonEditorModal.classList.contains('show')) {
       closeEditorModal();
+    }
+    if (e.key === 'Escape' && elements.projectsModal.classList.contains('show')) {
+      closeProjectsManagementModal();
+    }
+    if (e.key === 'Escape' && elements.projectFormModal.classList.contains('show')) {
+      closeProjectFormModal();
+    }
+    if (e.key === 'Escape' && elements.experienceModal.classList.contains('show')) {
+      closeExperienceManagementModal();
+    }
+    if (e.key === 'Escape' && elements.educationModal.classList.contains('show')) {
+      closeEducationManagementModal();
+    }
+    if (e.key === 'Escape' && elements.educationFormModal.classList.contains('show')) {
+      closeEducationFormModal();
+    }
+    if (e.key === 'Escape' && elements.experienceFormModal.classList.contains('show')) {
+      closeExperienceFormModal();
+    }
+    if (e.key === 'Escape' && elements.personalInfoModal.classList.contains('show')) {
+      closePersonalInfoModal();
+    }
+    if (e.key === 'Escape' && elements.summaryModal.classList.contains('show')) {
+      closeSummaryModal();
+    }
+    if (e.key === 'Escape' && elements.gdprModal.classList.contains('show')) {
+      closeGdprModal();
+    }
+    if (e.key === 'Escape' && elements.educationModal.classList.contains('show')) {
+      closeEducationManagementModal();
+    }
+    if (e.key === 'Escape' && elements.educationFormModal.classList.contains('show')) {
+      closeEducationFormModal();
     }
   });
 }
@@ -208,7 +447,7 @@ async function handleFileUpload(event) {
         state.enabledSections = { ...meta.enabledSections };
       }
 
-      // Apply meta settings (theme/color/photo)
+      // Apply meta settings (theme/color/photo/customSectionNames)
       applyMetaSettings(meta);
 
       flashPreviewStatus('JSON file uploaded successfully', 'status-success');
@@ -287,6 +526,11 @@ async function handleThemeChange(event) {
       elements.colorSelect.value = '';
     } else {
       elements.colorGroup.style.display = 'block';
+      // Default to blue when switching from mono to colorful themes
+      if (!state.selectedColor && state.colors.includes('blue')) {
+        state.selectedColor = 'blue';
+        elements.colorSelect.value = 'blue';
+      }
     }
   } else {
     elements.colorGroup.style.display = 'none';
@@ -316,10 +560,8 @@ function updateButtonStates() {
   const hasColor = state.selectedColor !== null;
   const hasJsonText = elements.jsonEditor.value.trim().length > 0;
 
-  // Generate Preview is only needed when JSON has been modified
-  const canGenerate = hasJsonText && hasTheme && (!needsColor || hasColor) && state.jsonModified;
-
-  elements.generateBtn.disabled = !canGenerate;
+  // Update export button states
+  elements.previewPdfBtn.disabled = !state.currentHtml;
   elements.exportPdfBtn.disabled = !state.currentHtml;
   elements.exportJsonBtn.disabled = !state.resumeData;
 }
@@ -353,7 +595,8 @@ async function generatePreview() {
         resumeData: filteredData,
         themeName: state.selectedTheme,
         colorName: state.selectedColor,
-        photoBase64: state.photoBase64
+        photoBase64: state.photoBase64,
+        customSectionNames: state.customSectionNames
       })
     });
 
@@ -396,7 +639,8 @@ function exportToJson() {
       enabledSections: state.enabledSections,
       selectedTheme: state.selectedTheme,
       selectedColor: state.selectedColor,
-      photoBase64: state.photoBase64
+      photoBase64: state.photoBase64,
+      customSectionNames: state.customSectionNames
     }
   };
 
@@ -457,6 +701,11 @@ function applyMetaSettings(meta) {
   // Apply photo (or clear to null if not provided)
   state.photoBase64 = meta.photoBase64 || null;
 
+  // Apply custom section names if available
+  if (meta.customSectionNames) {
+    state.customSectionNames = { ...meta.customSectionNames };
+  }
+
   updateButtonStates();
 }
 
@@ -489,7 +738,8 @@ async function exportToPdf() {
         resumeData: filteredData,
         themeName: state.selectedTheme,
         colorName: state.selectedColor,
-        photoBase64: state.photoBase64
+        photoBase64: state.photoBase64,
+        customSectionNames: state.customSectionNames
       })
     });
 
@@ -548,13 +798,11 @@ function fixCommonJsonErrors(jsonString) {
 
 // UI Helper Functions
 function showError(message) {
-  elements.jsonError.textContent = message;
-  elements.jsonError.classList.add('show');
+  setPreviewStatus(message, 'status-error');
 }
 
 function hideError() {
-  elements.jsonError.classList.remove('show');
-  elements.jsonError.textContent = '';
+  resetPreviewStatus();
 }
 
 let previewStatusTimeout = null;
@@ -591,12 +839,9 @@ function showPreviewNotification(message) {
 
 function showLoading(isLoading) {
   if (isLoading) {
-    elements.generateBtn.classList.add('loading');
     elements.exportPdfBtn.classList.add('loading');
-    elements.generateBtn.disabled = true;
     elements.exportPdfBtn.disabled = true;
   } else {
-    elements.generateBtn.classList.remove('loading');
     elements.exportPdfBtn.classList.remove('loading');
     updateButtonStates();
   }
@@ -696,8 +941,8 @@ function openSectionEditor(sectionKey) {
       mode: { name: 'javascript', json: true },
       lineNumbers: true,
       lineWrapping: true,
-      foldGutter: true,
-      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+      foldGutter: false,
+      gutters: ['CodeMirror-linenumbers'],
       matchBrackets: true,
       autoCloseBrackets: true,
       indentUnit: 2,
@@ -713,8 +958,38 @@ function openSectionEditor(sectionKey) {
   clearJsonErrors();
   hideError();
 
-  // Update modal title
-  elements.modalSectionTitle.textContent = `Edit ${getSectionDisplayName(sectionKey)}`;
+  // Update modal icon to match section icon
+  const sectionIcon = getSectionIcon(sectionKey);
+  elements.modalSectionIcon.textContent = '';
+  elements.modalSectionIcon.className = sectionIcon;
+
+  // Sections that have visible headers in the CV
+  const sectionsWithHeaders = ['experience', 'education', 'skills', 'projects'];
+  const hasHeader = sectionsWithHeaders.includes(sectionKey);
+
+  // Update modal title - use CV header name for sections with headers, sidebar name otherwise
+  const sectionName = hasHeader ? getCVHeaderName(sectionKey) : getSectionDisplayName(sectionKey);
+
+  const spanElement = document.createElement('span');
+  spanElement.textContent = sectionName;
+
+  elements.modalSectionTitle.innerHTML = '';
+  elements.modalSectionTitle.appendChild(spanElement);
+
+  // Only add rename button for sections that have headers in the CV
+  if (hasHeader) {
+    const btnElement = document.createElement('button');
+    btnElement.className = 'btn-rename-section-modal';
+    btnElement.title = 'Rename CV section header';
+    btnElement.innerHTML = '<i class="fas fa-pen"></i>';
+
+    elements.modalSectionTitle.appendChild(btnElement);
+
+    // Add click listener for rename button in modal
+    btnElement.addEventListener('click', () => {
+      renameSectionPrompt(sectionKey);
+    });
+  }
 
   // Get section-specific JSON
   const sectionData = state.resumeData[sectionKey];
@@ -747,6 +1022,39 @@ function closeEditorModal() {
 }
 
 function saveEditorChanges() {
+  // Check if we're editing a single project
+  if (currentEditingProjectIndex !== null) {
+    const projectJson = state.codeMirrorEditor.getValue().trim();
+
+    try {
+      const projectData = JSON.parse(projectJson);
+
+      // Update the specific project
+      state.resumeData.projects[currentEditingProjectIndex] = projectData;
+
+      // Update the hidden JSON editor
+      elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+
+      // Mark as modified
+      state.jsonModified = true;
+      updateButtonStates();
+
+      // Close modal and reopen projects management
+      closeEditorModal();
+      currentEditingProjectIndex = null;
+      openProjectsManagementModal();
+
+      // Show success message
+      flashPreviewStatus('Project updated successfully', 'status-success');
+
+    } catch (error) {
+      showError(`Invalid JSON for project: ${error.message}`);
+      highlightJsonError(projectJson, error);
+    }
+    return;
+  }
+
+  // Regular section editing
   if (!state.currentEditingSection || !state.codeMirrorEditor) {
     closeEditorModal();
     return;
@@ -765,6 +1073,9 @@ function saveEditorChanges() {
     // Update the hidden JSON editor
     elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
 
+    // Clear any error state for this section
+    state.sectionErrors[sectionKey] = false;
+
     // Mark as modified
     state.jsonModified = true;
     updateButtonStates();
@@ -772,12 +1083,21 @@ function saveEditorChanges() {
     // Close modal
     closeEditorModal();
 
+    // Update section UI to remove error indicator
+    updateSectionManagementUI();
+
     // Show success message
     flashPreviewStatus(`${getSectionDisplayName(sectionKey)} updated successfully`, 'status-success');
 
     // Auto-generate preview
     autoGeneratePreview('section-edit');
   } catch (error) {
+    // Mark this section as having an error
+    state.sectionErrors[sectionKey] = true;
+
+    // Update section UI to show error indicator
+    updateSectionManagementUI();
+
     showError(`Invalid JSON for ${getSectionDisplayName(sectionKey)}: ${error.message}`);
     highlightJsonError(sectionJson, error);
   }
@@ -922,6 +1242,7 @@ function updateSectionManagementUI() {
     const isFixed = FIXED_SECTIONS.includes(sectionKey);
     const isRequired = REQUIRED_SECTIONS.includes(sectionKey);
     const isEnabled = state.enabledSections[sectionKey];
+    const hasError = state.sectionErrors[sectionKey] === true;
 
     if (isFixed) {
       item.classList.add('section-item-fixed');
@@ -934,17 +1255,24 @@ function updateSectionManagementUI() {
       item.classList.add('section-item-disabled');
     }
 
+    if (hasError) {
+      item.classList.add('section-item-error');
+    }
+
     // Build section HTML
     const sectionIcon = getSectionIcon(sectionKey);
-    const sectionName = getSectionDisplayName(sectionKey);
+    const sectionIconMarkup = `<i class="${sectionIcon}" aria-hidden="true"></i>`;
+    const sectionName = getDefaultSectionName(sectionKey); // Always use default name in sidebar
     const badge = isFixed ? '<span class="section-item-badge">Fixed Position</span>' : '';
+    const errorWarning = hasError ? '<i class="fas fa-exclamation-triangle section-error-icon" title="This section has a JSON error"></i>' : '';
 
     item.innerHTML = `
       <i class="fas fa-grip-vertical section-item-grip"></i>
       <div class="section-item-info">
         <div class="section-item-name">
-          <i class="${sectionIcon}"></i>
+          ${sectionIconMarkup}
           ${sectionName}
+          ${errorWarning}
         </div>
         ${badge}
       </div>
@@ -967,7 +1295,23 @@ function updateSectionManagementUI() {
     const editBtn = item.querySelector('.btn-edit-section');
 
     toggleCheckbox.addEventListener('change', (e) => handleSectionToggle(sectionKey, e.target.checked));
-    editBtn.addEventListener('click', () => openSectionEditor(sectionKey));
+    editBtn.addEventListener('click', () => {
+      if (sectionKey === 'projects') {
+        openProjectsManagementModal();
+      } else if (sectionKey === 'experience') {
+        openExperienceManagementModal();
+      } else if (sectionKey === 'personalInfo') {
+        openPersonalInfoModal();
+      } else if (sectionKey === 'summary') {
+        openSummaryModal();
+      } else if (sectionKey === 'gdprClause') {
+        openGdprModal();
+      } else if (sectionKey === 'education') {
+        openEducationManagementModal();
+      } else {
+        openSectionEditor(sectionKey);
+      }
+    });
 
     // Add drag-and-drop event listeners only for reorderable sections
     if (!isFixed) {
@@ -997,27 +1341,340 @@ function getSectionIcon(section) {
   const icons = {
     personalInfo: 'fas fa-user',
     summary: 'fas fa-align-left',
-    skills: 'fas fa-code',
+    skills: 'fas fa-lightbulb',
     experience: 'fas fa-briefcase',
     education: 'fas fa-graduation-cap',
-    projects: 'fas fa-project-diagram',
+    projects: 'fas fa-rocket',
     gdprClause: 'fas fa-shield-alt'
   };
   return icons[section] || 'fas fa-file';
 }
 
-// Get display name for section
+// Get display name for section (sidebar names)
 function getSectionDisplayName(section) {
+  // Check if there's a custom name first
+  if (state.customSectionNames && state.customSectionNames[section]) {
+    return state.customSectionNames[section];
+  }
+
+  // Fall back to default names
   const names = {
     personalInfo: 'Personal Information',
     summary: 'Summary',
-    skills: 'Skills',
+    skills: 'Skills & Languages',
     experience: 'Experience',
     education: 'Education',
     projects: 'Hobby Projects',
     gdprClause: 'GDPR Clause'
   };
   return names[section] || section;
+}
+
+// Get CV header name for section (what appears in the actual CV)
+function getCVHeaderName(section) {
+  // Check if there's a custom name first
+  if (state.customSectionNames && state.customSectionNames[section]) {
+    return state.customSectionNames[section];
+  }
+
+  // Default CV header names in title case (first letter upper, rest lower)
+  const cvHeaders = {
+    skills: '💡 Skills',
+    experience: '💼 Experience',
+    education: '🎓 Education',
+    projects: '🚀 Projects'
+  };
+  return cvHeaders[section] || section;
+}
+
+// Rename a section with inline editing
+function renameSectionPrompt(sectionKey) {
+  const currentName = getCVHeaderName(sectionKey);
+  const defaultName = getDefaultCVHeaderName(sectionKey);
+
+  // Find which modal title to use based on section
+  let titleElement;
+  let containerElement;
+  let existingRenameBtn = null;
+
+  if (state.currentEditingSection === sectionKey) {
+    titleElement = elements.modalSectionTitle.querySelector('span');
+    containerElement = elements.modalSectionTitle;
+    existingRenameBtn = elements.modalSectionTitle.querySelector('.btn-rename-section-modal');
+  } else if (sectionKey === 'projects') {
+    titleElement = document.getElementById('projectsModalTitle');
+    containerElement = titleElement.parentElement;
+    existingRenameBtn = document.getElementById('renameProjectsSectionBtn');
+  } else if (sectionKey === 'experience') {
+    titleElement = document.getElementById('experienceModalTitle');
+    containerElement = titleElement.parentElement;
+    existingRenameBtn = document.getElementById('renameExperienceSectionBtn');
+  } else if (sectionKey === 'education') {
+    titleElement = document.getElementById('educationModalTitle');
+    containerElement = titleElement.parentElement;
+    existingRenameBtn = document.getElementById('renameEducationSectionBtn');
+  }
+
+  if (!titleElement) return;
+
+  // Store original HTML of the span
+  const originalSpanHTML = titleElement.outerHTML;
+
+  // IMPORTANT: Hide the existing rename button while editing
+  if (existingRenameBtn) {
+    existingRenameBtn.style.display = 'none';
+  }
+
+  // Create editing container
+  const editingDiv = document.createElement('div');
+  editingDiv.className = 'section-name-editing';
+
+  // Create input
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'section-name-input';
+  input.value = currentName;
+
+  // Create controls container
+  const controlsDiv = document.createElement('div');
+  controlsDiv.className = 'section-name-edit-controls';
+
+  // Create save button
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'btn-save-section-name';
+  saveBtn.innerHTML = '<i class="fas fa-check"></i> Save';
+
+  // Create cancel button
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn-cancel-section-name';
+  cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+
+  // Assemble the elements
+  controlsDiv.appendChild(saveBtn);
+  controlsDiv.appendChild(cancelBtn);
+  editingDiv.appendChild(input);
+  editingDiv.appendChild(controlsDiv);
+
+  // Replace title span with input
+  titleElement.replaceWith(editingDiv);
+
+  // Save function
+  const saveName = () => {
+    console.log('Save button clicked');
+    const trimmedName = input.value.trim();
+    console.log('New name:', trimmedName);
+
+    if (!trimmedName) {
+      alert('Section name cannot be empty.');
+      input.focus();
+      return;
+    }
+
+    // If the new name is the same as the default, remove the custom name
+    if (trimmedName === defaultName) {
+      delete state.customSectionNames[sectionKey];
+      console.log('Removed custom name (reverting to default)');
+    } else {
+      state.customSectionNames[sectionKey] = trimmedName;
+      console.log('Set custom name:', sectionKey, '=', trimmedName);
+    }
+
+    console.log('Current customSectionNames:', state.customSectionNames);
+
+    // Close edit mode by restoring the normal view
+    const displayName = trimmedName;
+
+    // Create the restored span with proper ID
+    const spanElement = document.createElement('span');
+    spanElement.textContent = displayName;
+
+    // Restore the proper ID for Projects/Experience modal titles
+    if (sectionKey === 'projects') {
+      spanElement.id = 'projectsModalTitle';
+    } else if (sectionKey === 'experience') {
+      spanElement.id = 'experienceModalTitle';
+    } else if (sectionKey === 'education') {
+      spanElement.id = 'educationModalTitle';
+    }
+
+    // Replace the editing div with the restored span
+    editingDiv.replaceWith(spanElement);
+
+    // Show the existing rename button again and reattach its listener
+    if (existingRenameBtn) {
+      existingRenameBtn.style.display = '';
+
+      // Clone and replace to remove old listeners, then add fresh one
+      const newBtn = existingRenameBtn.cloneNode(true);
+      existingRenameBtn.parentNode.replaceChild(newBtn, existingRenameBtn);
+
+      newBtn.addEventListener('click', () => {
+        console.log('Pen icon clicked for section:', sectionKey);
+        renameSectionPrompt(sectionKey);
+      });
+
+      console.log('Edit mode closed, existing pen icon restored and clickable');
+    }
+
+    // Regenerate preview with new section name
+    autoGeneratePreview('section-edit');
+
+    flashPreviewStatus(`CV section header renamed to "${displayName}"`, 'status-success');
+  };
+
+  // Cancel function
+  const cancelEdit = () => {
+    // Create a temp div to parse the original HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = originalSpanHTML;
+    const restoredElement = tempDiv.firstChild;
+
+    // Replace editing div with original span element
+    editingDiv.replaceWith(restoredElement);
+
+    // Show the existing rename button again and reattach its listener
+    if (existingRenameBtn) {
+      existingRenameBtn.style.display = '';
+
+      // Clone and replace to remove old listeners, then add fresh one
+      const newBtn = existingRenameBtn.cloneNode(true);
+      existingRenameBtn.parentNode.replaceChild(newBtn, existingRenameBtn);
+
+      newBtn.addEventListener('click', () => {
+        console.log('Pen icon clicked for section (after cancel):', sectionKey);
+        renameSectionPrompt(sectionKey);
+      });
+    }
+  };
+
+  // Event listeners
+  saveBtn.addEventListener('click', saveName);
+  cancelBtn.addEventListener('click', cancelEdit);
+
+  // Enter to save, Escape to cancel
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveName();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelEdit();
+    }
+  });
+
+  // Focus and select input
+  setTimeout(() => {
+    input.focus();
+    input.select();
+  }, 10);
+}
+
+// Helper function to update section names in all open modals
+function updateSectionNameInModals(sectionKey, newName) {
+  console.log('Updating section name in modals:', sectionKey, newName);
+
+  // Update regular section editor modal
+  if (state.currentEditingSection === sectionKey) {
+    console.log('Updating modal section title');
+    const spanElement = document.createElement('span');
+    spanElement.textContent = newName;
+
+    const btnElement = document.createElement('button');
+    btnElement.className = 'btn-rename-section-modal';
+    btnElement.title = 'Rename section';
+    btnElement.innerHTML = '<i class="fas fa-pen"></i>';
+
+    elements.modalSectionTitle.innerHTML = '';
+    elements.modalSectionTitle.appendChild(spanElement);
+    elements.modalSectionTitle.appendChild(btnElement);
+
+    // Re-attach event listener
+    btnElement.addEventListener('click', () => {
+      renameSectionPrompt(sectionKey);
+    });
+  }
+
+  // Update Projects modal title if open
+  if (sectionKey === 'projects') {
+    const titleEl = document.getElementById('projectsModalTitle');
+    if (titleEl) {
+      titleEl.textContent = newName;
+      console.log('Updated projects modal title to:', newName);
+
+      // Reattach event listener to rename button
+      const renameBtn = document.getElementById('renameProjectsSectionBtn');
+      if (renameBtn) {
+        const newRenameBtn = renameBtn.cloneNode(true);
+        renameBtn.parentNode.replaceChild(newRenameBtn, renameBtn);
+        newRenameBtn.addEventListener('click', () => {
+          console.log('Projects rename button clicked (after save)');
+          renameSectionPrompt('projects');
+        });
+      }
+    }
+  }
+
+  // Update Experience modal title if open
+  if (sectionKey === 'experience') {
+    const titleEl = document.getElementById('experienceModalTitle');
+    if (titleEl) {
+      titleEl.textContent = newName;
+      console.log('Updated experience modal title to:', newName);
+
+      // Reattach event listener to rename button
+      const renameBtn = document.getElementById('renameExperienceSectionBtn');
+      if (renameBtn) {
+        const newRenameBtn = renameBtn.cloneNode(true);
+        renameBtn.parentNode.replaceChild(newRenameBtn, renameBtn);
+        newRenameBtn.addEventListener('click', () => {
+          console.log('Experience rename button clicked (after save)');
+          renameSectionPrompt('experience');
+        });
+      }
+    }
+  }
+
+  // Update Education modal title if open
+  if (sectionKey === 'education') {
+    const titleEl = document.getElementById('educationModalTitle');
+    if (titleEl) {
+      titleEl.textContent = newName;
+
+      const renameBtn = document.getElementById('renameEducationSectionBtn');
+      if (renameBtn) {
+        const newBtn = renameBtn.cloneNode(true);
+        renameBtn.parentNode.replaceChild(newBtn, renameBtn);
+        newBtn.addEventListener('click', () => {
+          renameSectionPrompt('education');
+        });
+      }
+    }
+  }
+}
+
+// Get default section name for sidebar (without custom overrides)
+function getDefaultSectionName(section) {
+  const names = {
+    personalInfo: 'Personal Information',
+    summary: 'Summary',
+    skills: 'Skills & Languages',
+    experience: 'Experience',
+    education: 'Education',
+    projects: 'Hobby Projects',
+    gdprClause: 'GDPR Clause'
+  };
+  return names[section] || section;
+}
+
+// Get default CV header name (without custom overrides)
+function getDefaultCVHeaderName(section) {
+  const cvHeaders = {
+    skills: '💡 Skills',
+    experience: '💼 Experience',
+    education: '🎓 Education',
+    projects: '🚀 Projects'
+  };
+  return cvHeaders[section] || section;
 }
 
 // Drag-and-drop handlers for section reordering
@@ -1155,6 +1812,1277 @@ function updateJsonOrder() {
     autoGeneratePreview('section-reorder');
   } catch (error) {
     console.error('Error updating JSON order:', error);
+  }
+}
+
+// Projects Management Functions
+let currentEditingProjectIndex = null;
+
+function openProjectsManagementModal() {
+  populateProjectsList();
+
+  // Update modal title with CV header name
+  const sectionName = getCVHeaderName('projects');
+  const titleElement = document.getElementById('projectsModalTitle');
+  titleElement.textContent = sectionName;
+
+  // Make sure the rename button event listener is attached
+  const renameBtn = document.getElementById('renameProjectsSectionBtn');
+  if (renameBtn) {
+    // Remove old listeners by cloning and replacing
+    const newRenameBtn = renameBtn.cloneNode(true);
+    renameBtn.parentNode.replaceChild(newRenameBtn, renameBtn);
+
+    // Add fresh event listener
+    newRenameBtn.addEventListener('click', () => {
+      console.log('Projects rename button clicked');
+      renameSectionPrompt('projects');
+    });
+  }
+
+  elements.projectsModal.classList.add('show');
+}
+
+function closeProjectsManagementModal() {
+  elements.projectsModal.classList.remove('show');
+  updateSectionManagementUI();
+  autoGeneratePreview('section-edit');
+}
+
+function populateProjectsList() {
+  if (!state.resumeData || !state.resumeData.projects) {
+    elements.projectsList.innerHTML = '<p style="color: var(--text-secondary); padding: 20px; text-align: center;">No projects yet. Click "Add New Project" to create one.</p>';
+    return;
+  }
+
+  const projects = state.resumeData.projects;
+  elements.projectsList.innerHTML = projects.map((project, index) => `
+    <div class="project-list-item">
+      <div class="project-list-item-info">
+        <div class="project-list-item-name">${project.name || 'Untitled Project'}</div>
+        <div class="project-list-item-desc">${project.description || 'No description'}</div>
+      </div>
+      <div class="project-list-item-controls">
+        <button class="btn btn-secondary btn-small" onclick="openProjectEditor(${index})">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button class="btn btn-danger btn-small" onclick="deleteProject(${index})">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openProjectEditor(projectIndex) {
+  currentEditingProjectIndex = projectIndex;
+  state.currentEditingSection = null; // Clear section editing state
+  const project = state.resumeData.projects[projectIndex];
+
+  // Populate form fields
+  elements.projectFormTitle.textContent = `Edit Project: ${project.name || 'Untitled'}`;
+  elements.projectName.value = project.name || '';
+  elements.projectDescription.value = project.description || '';
+  elements.projectTechnologies.value = project.technologies ? project.technologies.join(', ') : '';
+  elements.projectLink.value = project.link || '';
+  hideProjectFormError();
+
+  // Close list modal, open form modal
+  elements.projectsModal.classList.remove('show');
+  elements.projectFormModal.classList.add('show');
+}
+
+function addNewProject() {
+  currentEditingProjectIndex = null;
+  elements.projectFormTitle.textContent = 'Add New Project';
+  elements.projectName.value = '';
+  elements.projectDescription.value = '';
+  elements.projectTechnologies.value = '';
+  elements.projectLink.value = '';
+  hideProjectFormError();
+
+  elements.projectsModal.classList.remove('show');
+  elements.projectFormModal.classList.add('show');
+}
+
+function deleteProject(projectIndex) {
+  if (!confirm('Are you sure you want to delete this project?')) {
+    return;
+  }
+
+  state.resumeData.projects.splice(projectIndex, 1);
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+
+  populateProjectsList();
+  flashPreviewStatus('Project deleted', 'status-success');
+  autoGeneratePreview('section-edit');
+}
+
+function closeProjectFormModal() {
+  elements.projectFormModal.classList.remove('show');
+  currentEditingProjectIndex = null;
+  elements.projectForm.reset();
+  hideProjectFormError();
+
+  // Reopen list modal
+  elements.projectsModal.classList.add('show');
+}
+
+function showProjectFormError(message) {
+  elements.projectFormError.textContent = message;
+  elements.projectFormError.classList.add('show');
+}
+
+function hideProjectFormError() {
+  elements.projectFormError.textContent = '';
+  elements.projectFormError.classList.remove('show');
+}
+
+function saveProjectForm() {
+  hideProjectFormError();
+
+  const name = elements.projectName.value.trim();
+  const description = elements.projectDescription.value.trim();
+  const technologiesText = elements.projectTechnologies.value.trim();
+  const link = elements.projectLink.value.trim();
+
+  if (!name || !description) {
+    showProjectFormError('Please provide both project name and description');
+    return;
+  }
+
+  const technologies = technologiesText
+    ? technologiesText.split(',').map(t => t.trim()).filter(Boolean)
+    : [];
+
+  const projectData = {
+    name,
+    description,
+    technologies,
+    link: link || ''
+  };
+
+  if (!state.resumeData.projects) {
+    state.resumeData.projects = [];
+  }
+
+  if (currentEditingProjectIndex !== null) {
+    state.resumeData.projects[currentEditingProjectIndex] = projectData;
+    flashPreviewStatus('Project updated successfully', 'status-success');
+  } else {
+    state.resumeData.projects.push(projectData);
+    flashPreviewStatus('Project added successfully', 'status-success');
+  }
+
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+  updateButtonStates();
+
+  closeProjectFormModal();
+  populateProjectsList();
+  autoGeneratePreview('section-edit');
+}
+
+// Experience Management Functions
+let currentEditingExperienceIndex = null;
+
+function openExperienceManagementModal() {
+  populateExperienceList();
+
+  // Update modal title with CV header name
+  const sectionName = getCVHeaderName('experience');
+  const titleElement = document.getElementById('experienceModalTitle');
+  titleElement.textContent = sectionName;
+
+  // Make sure the rename button event listener is attached
+  const renameBtn = document.getElementById('renameExperienceSectionBtn');
+  if (renameBtn) {
+    // Remove old listeners by cloning and replacing
+    const newRenameBtn = renameBtn.cloneNode(true);
+    renameBtn.parentNode.replaceChild(newRenameBtn, renameBtn);
+
+    // Add fresh event listener
+    newRenameBtn.addEventListener('click', () => {
+      console.log('Experience rename button clicked');
+      renameSectionPrompt('experience');
+    });
+  }
+
+  elements.experienceModal.classList.add('show');
+
+  // Position badges after initial render
+  requestAnimationFrame(renderExperienceBadges);
+}
+
+function closeExperienceManagementModal() {
+  elements.experienceModal.classList.remove('show');
+  updateSectionManagementUI();
+  autoGeneratePreview('section-edit');
+}
+
+// Education Management Functions
+let currentEditingEducationIndex = null;
+
+function openEducationManagementModal() {
+  populateEducationList();
+
+  // Update modal title with CV header name
+  const sectionName = getCVHeaderName('education');
+  const titleElement = document.getElementById('educationModalTitle');
+  titleElement.textContent = sectionName;
+
+  // Attach rename button listener fresh
+  const renameBtn = document.getElementById('renameEducationSectionBtn');
+  if (renameBtn) {
+    const newRenameBtn = renameBtn.cloneNode(true);
+    renameBtn.parentNode.replaceChild(newRenameBtn, renameBtn);
+    newRenameBtn.addEventListener('click', () => {
+      renameSectionPrompt('education');
+    });
+  }
+
+  elements.educationModal.classList.add('show');
+
+  requestAnimationFrame(renderEducationBadges);
+}
+
+function closeEducationManagementModal() {
+  elements.educationModal.classList.remove('show');
+  removeEducationBadges();
+  updateSectionManagementUI();
+  autoGeneratePreview('section-edit');
+}
+
+function populateEducationList() {
+  if (!state.resumeData || !state.resumeData.education) {
+    elements.educationList.innerHTML = '<p style="color: var(--text-secondary); padding: 20px; text-align: center;">No education yet. Click "Add Education" to create one.</p>';
+    removeEducationBadges();
+    return;
+  }
+
+  const education = state.resumeData.education;
+  const total = education.length;
+
+  elements.educationList.innerHTML = education.map((edu, index) => {
+    const startDate = edu.startDate ? formatDateForDisplay(edu.startDate) : '';
+    const gradDate = edu.graduationDate ? formatDateForDisplay(edu.graduationDate) : 'Present';
+    const dateRange = startDate ? `${startDate} - ${gradDate}` : gradDate;
+
+    return `
+    <div class="experience-list-item-row" data-edu-index="${index}">
+      <div class="experience-list-item">
+        <div class="experience-drag-handle" title="Drag to reorder">
+          <i class="fas fa-grip-vertical"></i>
+        </div>
+        <div class="experience-list-item-info">
+          <div class="experience-list-item-position">${edu.degree || 'Untitled Degree'}</div>
+          <div class="experience-list-item-company">${edu.institution || 'No institution'}</div>
+          <div class="experience-list-item-date">${dateRange}</div>
+          <div class="experience-list-item-company" style="margin-top: 2px;">${edu.level || ''}</div>
+        </div>
+        <div class="experience-list-item-controls">
+          <button class="btn btn-secondary btn-small" onclick="openEducationEditor(${index})">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <button class="btn btn-danger btn-small" onclick="deleteEducation(${index})">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    `;
+  }).join('');
+
+  // Attach drag-and-drop handlers for reordering
+  const rows = elements.educationList.querySelectorAll('.experience-list-item-row');
+  rows.forEach(row => {
+    if (total < 2) return;
+    const handle = row.querySelector('.experience-drag-handle');
+    if (!handle) return;
+
+    handle.draggable = true;
+    handle.addEventListener('dragstart', handleEducationDragStart);
+    handle.addEventListener('dragend', handleEducationDragEnd);
+
+    row.addEventListener('dragover', handleEducationDragOver);
+    row.addEventListener('drop', handleEducationDrop);
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+  });
+
+  renderEducationBadges();
+}
+function populateExperienceList() {
+  if (!state.resumeData || !state.resumeData.experience) {
+    elements.experienceList.innerHTML = '<p style="color: var(--text-secondary); padding: 20px; text-align: center;">No experience yet. Click "Add New Experience" to create one.</p>';
+    return;
+  }
+
+  const experiences = state.resumeData.experience;
+  const total = experiences.length;
+
+  elements.experienceList.innerHTML = experiences.map((exp, index) => {
+    const startDate = exp.startDate ? formatDateForDisplay(exp.startDate) : '';
+    const endDate = exp.endDate ? formatDateForDisplay(exp.endDate) : 'Present';
+    const dateRange = startDate ? `${startDate} - ${endDate}` : endDate;
+
+    return `
+    <div class="experience-list-item-row" data-index="${index}">
+      <div class="experience-list-item">
+        <div class="experience-drag-handle" title="Drag to reorder">
+          <i class="fas fa-grip-vertical"></i>
+        </div>
+        <div class="experience-list-item-info">
+          <div class="experience-list-item-position">${exp.position || 'Untitled Position'}</div>
+          <div class="experience-list-item-company">${exp.company || 'No company'}</div>
+          <div class="experience-list-item-date">${dateRange}</div>
+        </div>
+        <div class="experience-list-item-controls">
+          <button class="btn btn-secondary btn-small" onclick="openExperienceEditor(${index})">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <button class="btn btn-danger btn-small" onclick="deleteExperience(${index})">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    `;
+  }).join('');
+
+  // Attach drag-and-drop handlers for reordering (handle initiates drag, rows are drop targets)
+  const rows = elements.experienceList.querySelectorAll('.experience-list-item-row');
+  rows.forEach(row => {
+    if (total < 2) return;
+    const handle = row.querySelector('.experience-drag-handle');
+    if (!handle) return;
+
+    handle.draggable = true;
+    handle.addEventListener('dragstart', handleExperienceDragStart);
+    handle.addEventListener('dragend', handleExperienceDragEnd);
+
+    row.addEventListener('dragover', handleExperienceDragOver);
+    row.addEventListener('drop', handleExperienceDrop);
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+  });
+
+  renderExperienceBadges();
+}
+
+function formatDateForDisplay(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${month}.${year}`;
+}
+
+// Experience drag-and-drop for reordering
+let draggedExperienceRow = null;
+let draggedExperienceIndex = null;
+
+function handleExperienceDragStart(e) {
+  draggedExperienceRow = e.currentTarget.closest('.experience-list-item-row');
+  if (!draggedExperienceRow) return;
+  draggedExperienceIndex = parseInt(draggedExperienceRow.dataset.index, 10);
+  draggedExperienceRow.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', '');
+
+  // Use the full card as the drag image for clearer feedback
+  const card = draggedExperienceRow.querySelector('.experience-list-item');
+  if (card) {
+    const rect = card.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+    e.dataTransfer.setDragImage(card, offsetX, offsetY);
+  }
+}
+
+function handleExperienceDragOver(e) {
+  if (!draggedExperienceRow) return;
+  e.preventDefault();
+  elements.experienceList.querySelectorAll('.experience-list-item-row').forEach(row => row.classList.remove('drag-over'));
+  const overRow = e.currentTarget.closest('.experience-list-item-row');
+  if (overRow) overRow.classList.add('drag-over');
+
+  const afterElement = getExperienceDragAfterElement(elements.experienceList, e.clientY);
+  if (afterElement == null) {
+    elements.experienceList.appendChild(draggedExperienceRow);
+  } else {
+    elements.experienceList.insertBefore(draggedExperienceRow, afterElement);
+  }
+}
+
+function handleExperienceDrop(e) {
+  e.preventDefault();
+  elements.experienceList.querySelectorAll('.experience-list-item-row').forEach(row => row.classList.remove('drag-over'));
+  applyExperienceReorder();
+}
+
+function handleExperienceDragEnd() {
+  if (draggedExperienceRow) {
+    draggedExperienceRow.classList.remove('dragging');
+  }
+  elements.experienceList.querySelectorAll('.experience-list-item-row').forEach(row => row.classList.remove('drag-over'));
+  applyExperienceReorder();
+
+  draggedExperienceRow = null;
+  draggedExperienceIndex = null;
+
+  renderExperienceBadges();
+}
+
+function getExperienceDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.experience-list-item-row:not(.dragging)')];
+
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    }
+    return closest;
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function renderExperienceBadges() {
+  requestAnimationFrame(() => {
+    const rows = elements.experienceList.querySelectorAll('.experience-list-item-row');
+    const total = rows.length;
+
+    if (total < 2) {
+      removeExperienceBadges();
+      return;
+    }
+
+    const newestRow = rows[0];
+    const oldestRow = rows[rows.length - 1];
+
+    const newestBadge = getOrCreateExperienceBadge('experienceBadgeNewest', 'Most recent', 'age-newest');
+    const oldestBadge = getOrCreateExperienceBadge('experienceBadgeOldest', 'Oldest', 'age-oldest');
+
+    positionExperienceBadge(newestBadge, newestRow);
+    positionExperienceBadge(oldestBadge, oldestRow);
+  });
+}
+
+function getOrCreateExperienceBadge(id, label, extraClass) {
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement('span');
+    el.id = id;
+    el.className = `experience-age-pill ${extraClass}`;
+    el.textContent = label;
+    el.setAttribute('aria-hidden', 'true');
+    elements.experienceList.appendChild(el);
+  } else {
+    el.className = `experience-age-pill ${extraClass}`;
+    el.textContent = label;
+  }
+  return el;
+}
+
+function positionExperienceBadge(badgeEl, rowEl) {
+  if (!badgeEl || !rowEl) return;
+  const top = rowEl.offsetTop - elements.experienceList.scrollTop + rowEl.offsetHeight / 2;
+  badgeEl.style.top = `${top}px`;
+  badgeEl.style.display = 'inline-flex';
+}
+
+function removeExperienceBadges() {
+  ['experienceBadgeNewest', 'experienceBadgeOldest'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+}
+
+function applyExperienceReorder() {
+  const existing = state.resumeData.experience || [];
+  if (existing.length < 2) return;
+
+  const rows = [...elements.experienceList.querySelectorAll('.experience-list-item-row')];
+  const newOrder = [];
+
+  rows.forEach(row => {
+    const originalIndex = parseInt(row.dataset.index, 10);
+    if (!isNaN(originalIndex) && existing[originalIndex] !== undefined) {
+      newOrder.push(existing[originalIndex]);
+    }
+  });
+
+  if (newOrder.length !== existing.length) return;
+
+  state.resumeData.experience = newOrder;
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+  updateButtonStates();
+
+  // Refresh list to reset data-index and badges
+  populateExperienceList();
+
+  autoGeneratePreview('section-reorder');
+
+  draggedExperienceIndex = null;
+}
+
+// Education drag-and-drop for reordering
+let draggedEducationRow = null;
+let draggedEducationIndex = null;
+
+function handleEducationDragStart(e) {
+  draggedEducationRow = e.currentTarget.closest('.experience-list-item-row');
+  if (!draggedEducationRow) return;
+  draggedEducationIndex = parseInt(draggedEducationRow.dataset.eduIndex, 10);
+  draggedEducationRow.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', '');
+
+  const card = draggedEducationRow.querySelector('.experience-list-item');
+  if (card) {
+    const rect = card.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+    e.dataTransfer.setDragImage(card, offsetX, offsetY);
+  }
+}
+
+function handleEducationDragOver(e) {
+  if (!draggedEducationRow) return;
+  e.preventDefault();
+  elements.educationList.querySelectorAll('.experience-list-item-row').forEach(row => row.classList.remove('drag-over'));
+  const overRow = e.currentTarget.closest('.experience-list-item-row');
+  if (overRow) overRow.classList.add('drag-over');
+
+  const afterElement = getEducationDragAfterElement(elements.educationList, e.clientY);
+  if (afterElement == null) {
+    elements.educationList.appendChild(draggedEducationRow);
+  } else {
+    elements.educationList.insertBefore(draggedEducationRow, afterElement);
+  }
+
+  renderEducationBadges();
+}
+
+function handleEducationDrop(e) {
+  e.preventDefault();
+  elements.educationList.querySelectorAll('.experience-list-item-row').forEach(row => row.classList.remove('drag-over'));
+  applyEducationReorder();
+}
+
+function handleEducationDragEnd() {
+  if (draggedEducationRow) {
+    draggedEducationRow.classList.remove('dragging');
+  }
+  elements.educationList.querySelectorAll('.experience-list-item-row').forEach(row => row.classList.remove('drag-over'));
+  applyEducationReorder();
+
+  draggedEducationRow = null;
+  draggedEducationIndex = null;
+}
+
+function getEducationDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.experience-list-item-row:not(.dragging)')];
+
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    }
+    return closest;
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function applyEducationReorder() {
+  const existing = state.resumeData.education || [];
+  if (existing.length < 2) return;
+
+  const rows = [...elements.educationList.querySelectorAll('.experience-list-item-row')];
+  const newOrder = [];
+
+  rows.forEach(row => {
+    const originalIndex = parseInt(row.dataset.eduIndex, 10);
+    if (!isNaN(originalIndex) && existing[originalIndex] !== undefined) {
+      newOrder.push(existing[originalIndex]);
+    }
+  });
+
+  if (newOrder.length !== existing.length) return;
+
+  state.resumeData.education = newOrder;
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+  updateButtonStates();
+
+  populateEducationList();
+  autoGeneratePreview('section-reorder');
+}
+
+function renderEducationBadges() {
+  requestAnimationFrame(() => {
+    const rows = elements.educationList.querySelectorAll('.experience-list-item-row');
+    const total = rows.length;
+
+    if (total < 2) {
+      removeEducationBadges();
+      return;
+    }
+
+    const newestRow = rows[0];
+    const oldestRow = rows[rows.length - 1];
+
+    const newestBadge = getOrCreateEducationBadge('educationBadgeNewest', 'Most recent', 'age-newest');
+    const oldestBadge = getOrCreateEducationBadge('educationBadgeOldest', 'Oldest', 'age-oldest');
+
+    positionEducationBadge(newestBadge, newestRow);
+    positionEducationBadge(oldestBadge, oldestRow);
+  });
+}
+
+function getOrCreateEducationBadge(id, label, extraClass) {
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement('span');
+    el.id = id;
+    el.className = `experience-age-pill ${extraClass}`;
+    el.textContent = label;
+    el.setAttribute('aria-hidden', 'true');
+    elements.educationList.appendChild(el);
+  } else {
+    el.className = `experience-age-pill ${extraClass}`;
+    el.textContent = label;
+  }
+  return el;
+}
+
+function positionEducationBadge(badgeEl, rowEl) {
+  if (!badgeEl || !rowEl) return;
+  const top = rowEl.offsetTop - elements.educationList.scrollTop + rowEl.offsetHeight / 2;
+  badgeEl.style.top = `${top}px`;
+  badgeEl.style.display = 'inline-flex';
+}
+
+function removeEducationBadges() {
+  ['educationBadgeNewest', 'educationBadgeOldest'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+}
+
+function openExperienceEditor(experienceIndex) {
+  currentEditingExperienceIndex = experienceIndex;
+  const experience = state.resumeData.experience[experienceIndex];
+
+  // Populate form fields
+  elements.experienceFormTitle.textContent = `Edit Experience: ${experience.position || 'Untitled'}`;
+  elements.expPosition.value = experience.position || '';
+  elements.expCompany.value = experience.company || '';
+  elements.expStartDate.value = experience.startDate || '';
+  elements.expEndDate.value = experience.endDate || '';
+
+  // Populate responsibilities
+  populateResponsibilities(experience.responsibilities || []);
+
+  // Close experience list modal and open form modal
+  elements.experienceModal.classList.remove('show');
+  elements.experienceFormModal.classList.add('show');
+}
+
+function addNewExperience() {
+  currentEditingExperienceIndex = null; // Indicate this is a new experience
+
+  // Clear form fields
+  elements.experienceFormTitle.textContent = 'Add New Experience';
+  elements.expPosition.value = '';
+  elements.expCompany.value = '';
+  elements.expStartDate.value = '';
+  elements.expEndDate.value = '';
+
+  // Add one empty responsibility field
+  populateResponsibilities([]);
+
+  // Close experience list modal and open form modal
+  elements.experienceModal.classList.remove('show');
+  elements.experienceFormModal.classList.add('show');
+}
+
+function deleteExperience(experienceIndex) {
+  if (!confirm('Are you sure you want to delete this experience?')) {
+    return;
+  }
+
+  state.resumeData.experience.splice(experienceIndex, 1);
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+
+  populateExperienceList();
+  flashPreviewStatus('Experience deleted', 'status-success');
+  autoGeneratePreview('section-edit');
+}
+
+// Education Form Functions
+function openEducationEditor(educationIndex) {
+  currentEditingEducationIndex = educationIndex;
+  const edu = state.resumeData.education[educationIndex];
+
+  elements.educationFormTitle.textContent = `Edit Education: ${edu.degree || 'Untitled'}`;
+  elements.edDegree.value = edu.degree || '';
+  elements.edLevel.value = edu.level || '';
+  elements.edInstitution.value = edu.institution || '';
+  elements.edStartDate.value = edu.startDate || '';
+  elements.edGraduationDate.value = edu.graduationDate || '';
+
+  hideEducationFormError();
+
+  elements.educationModal.classList.remove('show');
+  elements.educationFormModal.classList.add('show');
+}
+
+function addNewEducation() {
+  currentEditingEducationIndex = null;
+
+  elements.educationFormTitle.textContent = 'Add Education';
+  elements.edDegree.value = '';
+  elements.edLevel.value = '';
+  elements.edInstitution.value = '';
+  elements.edStartDate.value = '';
+  elements.edGraduationDate.value = '';
+
+  hideEducationFormError();
+
+  elements.educationModal.classList.remove('show');
+  elements.educationFormModal.classList.add('show');
+}
+
+function deleteEducation(index) {
+  if (!confirm('Are you sure you want to delete this education entry?')) return;
+
+  state.resumeData.education.splice(index, 1);
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+
+  populateEducationList();
+  flashPreviewStatus('Education entry deleted', 'status-success');
+  autoGeneratePreview('section-edit');
+}
+
+// Experience Form Functions
+function populateResponsibilities(responsibilities) {
+  elements.responsibilitiesList.innerHTML = '';
+
+  if (responsibilities.length === 0) {
+    addResponsibilityField();
+  } else {
+    responsibilities.forEach((resp, index) => {
+      addResponsibilityField(resp);
+    });
+  }
+}
+
+function addResponsibilityField(text = '') {
+  const item = document.createElement('div');
+  item.className = 'responsibility-item';
+  item.innerHTML = `
+    <input type="text" value="${text || ''}" placeholder="Describe a responsibility or achievement..." />
+    <button type="button" class="btn-icon" onclick="removeResponsibility(this)" title="Remove">
+      <i class="fas fa-trash"></i>
+    </button>
+  `;
+  elements.responsibilitiesList.appendChild(item);
+}
+
+function removeResponsibility(button) {
+  const item = button.closest('.responsibility-item');
+  item.remove();
+}
+
+function closeExperienceFormModal() {
+  elements.experienceFormModal.classList.remove('show');
+  currentEditingExperienceIndex = null;
+  elements.experienceForm.reset();
+  elements.responsibilitiesList.innerHTML = '';
+  hideExperienceFormError();
+}
+
+function showExperienceFormError(message) {
+  elements.experienceFormError.textContent = message;
+  elements.experienceFormError.classList.add('show');
+}
+
+function hideExperienceFormError() {
+  elements.experienceFormError.textContent = '';
+  elements.experienceFormError.classList.remove('show');
+}
+
+function saveExperienceForm() {
+  hideExperienceFormError();
+
+  // Validate required fields
+  if (!elements.expPosition.value.trim() || !elements.expCompany.value.trim() || !elements.expStartDate.value) {
+    showExperienceFormError('Please fill in all required fields (Position, Company, Start Date)');
+    return;
+  }
+
+  // Validate dates
+  const startDate = elements.expStartDate.value.trim();
+  const endDate = elements.expEndDate.value.trim();
+
+  if (!validateDateFormatWithError(startDate, showExperienceFormError)) {
+    return;
+  }
+
+  if (endDate && !validateDateFormatWithError(endDate, showExperienceFormError)) {
+    return;
+  }
+
+  // Check that end date is after start date
+  if (endDate && startDate >= endDate) {
+    showExperienceFormError('End date must be after start date');
+    return;
+  }
+
+  // Collect responsibilities
+  const responsibilities = [];
+  const responsibilityInputs = elements.responsibilitiesList.querySelectorAll('.responsibility-item input[type="text"]');
+  responsibilityInputs.forEach(input => {
+    const text = input.value.trim();
+    if (text) {
+      responsibilities.push(text);
+    }
+  });
+
+  // Create experience object
+  const experienceData = {
+    position: elements.expPosition.value.trim(),
+    company: elements.expCompany.value.trim(),
+    startDate: startDate,
+    endDate: endDate || null,
+    responsibilities: responsibilities
+  };
+
+  // Update or add experience
+  if (currentEditingExperienceIndex !== null) {
+    // Update existing
+    state.resumeData.experience[currentEditingExperienceIndex] = experienceData;
+    flashPreviewStatus('Experience updated successfully', 'status-success');
+  } else {
+    // Add new
+    if (!state.resumeData.experience) {
+      state.resumeData.experience = [];
+    }
+    state.resumeData.experience.push(experienceData);
+    flashPreviewStatus('New experience added', 'status-success');
+  }
+
+  // Update JSON editor
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+
+  // Close form and reopen experience list
+  closeExperienceFormModal();
+  openExperienceManagementModal();
+  autoGeneratePreview('section-edit');
+}
+
+// Validate date format (YYYY-MM)
+function validateDateFormat(dateStr) {
+  return validateDateFormatWithError(dateStr, showError);
+}
+
+// Validate date format with custom error display function
+function validateDateFormatWithError(dateStr, errorFn) {
+  // Check format YYYY-MM
+  const datePattern = /^(\d{4})-(\d{2})$/;
+  const match = dateStr.match(datePattern);
+
+  if (!match) {
+    errorFn('Date must be in YYYY-MM format (e.g., 2023-06)');
+    return false;
+  }
+
+  const year = parseInt(match[1]);
+  const month = parseInt(match[2]);
+
+  // Validate year (reasonable range)
+  if (year < 1900 || year > 2100) {
+    errorFn('Year must be between 1900 and 2100');
+    return false;
+  }
+
+  // Validate month (01-12)
+  if (month < 1 || month > 12) {
+    errorFn('Month must be between 01 and 12');
+    return false;
+  }
+
+  return true;
+}
+
+function closeEducationFormModal() {
+  elements.educationFormModal.classList.remove('show');
+  currentEditingEducationIndex = null;
+  elements.educationForm.reset();
+  hideEducationFormError();
+}
+
+function showEducationFormError(message) {
+  elements.educationFormError.textContent = message;
+  elements.educationFormError.classList.add('show');
+}
+
+function hideEducationFormError() {
+  elements.educationFormError.textContent = '';
+  elements.educationFormError.classList.remove('show');
+}
+
+function saveEducationForm() {
+  hideEducationFormError();
+
+  const degree = elements.edDegree.value.trim();
+  const level = elements.edLevel.value.trim();
+  const institution = elements.edInstitution.value.trim();
+  const startDate = elements.edStartDate.value.trim();
+  const graduationDate = elements.edGraduationDate.value.trim();
+
+  if (!degree || !level || !institution || !startDate) {
+    showEducationFormError('Please fill in all required fields (Degree, Level, Institution, Start Date)');
+    return;
+  }
+
+  if (!validateDateFormatWithError(startDate, showEducationFormError)) {
+    return;
+  }
+
+  if (graduationDate && !validateDateFormatWithError(graduationDate, showEducationFormError)) {
+    return;
+  }
+
+  if (graduationDate && startDate >= graduationDate) {
+    showEducationFormError('Graduation date must be after start date');
+    return;
+  }
+
+  const educationData = {
+    degree,
+    level,
+    institution,
+    startDate,
+    graduationDate: graduationDate || null
+  };
+
+  if (currentEditingEducationIndex !== null) {
+    state.resumeData.education[currentEditingEducationIndex] = educationData;
+    flashPreviewStatus('Education updated successfully', 'status-success');
+  } else {
+    if (!state.resumeData.education) {
+      state.resumeData.education = [];
+    }
+    state.resumeData.education.push(educationData);
+    flashPreviewStatus('Education added successfully', 'status-success');
+  }
+
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+  updateButtonStates();
+
+  closeEducationFormModal();
+  populateEducationList();
+  elements.educationModal.classList.add('show');
+
+  updateSectionManagementUI();
+  autoGeneratePreview('section-edit');
+}
+
+// Personal Info Modal Functions
+function openPersonalInfoModal() {
+  // Populate form with current data
+  const personalInfo = state.resumeData?.personalInfo || {};
+
+  elements.piName.value = personalInfo.name || '';
+  elements.piTitle.value = personalInfo.title || '';
+  elements.piEmail.value = personalInfo.email || '';
+  elements.piPhone.value = personalInfo.phone || '';
+  elements.piWebsite.value = personalInfo.website || '';
+  elements.piLinkedin.value = personalInfo.linkedin || '';
+  elements.piGithub.value = personalInfo.github || '';
+
+  // Hide any previous errors
+  hidePersonalInfoFormError();
+
+  elements.personalInfoModal.classList.add('show');
+}
+
+function closePersonalInfoModal() {
+  elements.personalInfoModal.classList.remove('show');
+  hidePersonalInfoFormError();
+}
+
+function showPersonalInfoFormError(message) {
+  elements.personalInfoFormError.textContent = message;
+  elements.personalInfoFormError.classList.add('show');
+}
+
+function hidePersonalInfoFormError() {
+  elements.personalInfoFormError.textContent = '';
+  elements.personalInfoFormError.classList.remove('show');
+}
+
+function savePersonalInfoForm() {
+  hidePersonalInfoFormError();
+
+  // Validate required fields
+  const name = elements.piName.value.trim();
+
+  if (!name) {
+    showPersonalInfoFormError('Full Name is required');
+    return;
+  }
+
+  // Validate email format if provided
+  const email = elements.piEmail.value.trim();
+  if (email && !isValidEmail(email)) {
+    showPersonalInfoFormError('Please enter a valid email address');
+    return;
+  }
+
+  // Build personalInfo object - only include non-empty fields
+  const personalInfo = { name };
+
+  const title = elements.piTitle.value.trim();
+  if (title) personalInfo.title = title;
+
+  // Only add optional fields if they have values
+  if (email) personalInfo.email = email;
+
+  const phone = elements.piPhone.value.trim();
+  if (phone) personalInfo.phone = phone;
+
+  const website = elements.piWebsite.value.trim();
+  if (website) personalInfo.website = website;
+
+  const linkedin = elements.piLinkedin.value.trim();
+  if (linkedin) personalInfo.linkedin = linkedin;
+
+  const github = elements.piGithub.value.trim();
+  if (github) personalInfo.github = github;
+
+  // Update state
+  state.resumeData.personalInfo = personalInfo;
+
+  // Update hidden JSON editor
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+  updateButtonStates();
+
+  // Close modal
+  closePersonalInfoModal();
+
+  // Update UI and preview
+  updateSectionManagementUI();
+  flashPreviewStatus('Personal information updated successfully', 'status-success');
+  autoGeneratePreview('section-edit');
+}
+
+// Simple email validation
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// GDPR Clause Modal Functions
+function openGdprModal() {
+  const clause = state.resumeData?.gdprClause || '';
+  elements.gdprTextarea.value = clause;
+
+  hideGdprFormError();
+
+  elements.gdprModal.classList.add('show');
+
+  setTimeout(() => {
+    elements.gdprTextarea.focus();
+  }, 100);
+}
+
+function closeGdprModal() {
+  elements.gdprModal.classList.remove('show');
+  hideGdprFormError();
+}
+
+function showGdprFormError(message) {
+  elements.gdprFormError.textContent = message;
+  elements.gdprFormError.classList.add('show');
+}
+
+function hideGdprFormError() {
+  elements.gdprFormError.textContent = '';
+  elements.gdprFormError.classList.remove('show');
+}
+
+function saveGdprForm() {
+  hideGdprFormError();
+
+  const clause = elements.gdprTextarea.value.trim();
+
+  // GDPR clause is optional; keep the key with empty string if cleared
+  state.resumeData.gdprClause = clause || '';
+
+  // Clear any previous JSON error flags for this section
+  state.sectionErrors.gdprClause = false;
+
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+  updateButtonStates();
+
+  closeGdprModal();
+
+  updateSectionManagementUI();
+  flashPreviewStatus('GDPR clause updated successfully', 'status-success');
+  autoGeneratePreview('section-edit');
+}
+
+// Summary Modal Functions
+function openSummaryModal() {
+  // Populate textarea with current summary
+  const summary = state.resumeData?.summary || '';
+  elements.summaryTextarea.value = summary;
+
+  // Hide any previous errors
+  hideSummaryFormError();
+
+  elements.summaryModal.classList.add('show');
+
+  // Focus textarea
+  setTimeout(() => {
+    elements.summaryTextarea.focus();
+  }, 100);
+}
+
+function closeSummaryModal() {
+  elements.summaryModal.classList.remove('show');
+  hideSummaryFormError();
+}
+
+function showSummaryFormError(message) {
+  elements.summaryFormError.textContent = message;
+  elements.summaryFormError.classList.add('show');
+}
+
+function hideSummaryFormError() {
+  elements.summaryFormError.textContent = '';
+  elements.summaryFormError.classList.remove('show');
+}
+
+function saveSummaryForm() {
+  hideSummaryFormError();
+
+  const summary = elements.summaryTextarea.value.trim();
+
+  // Summary can be empty - user might want to remove it
+  // Update state
+  if (summary) {
+    state.resumeData.summary = summary;
+  } else {
+    // If empty, keep the key but with empty string
+    state.resumeData.summary = '';
+  }
+
+  // Update hidden JSON editor
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+  updateButtonStates();
+
+  // Close modal
+  closeSummaryModal();
+
+  // Update UI and preview
+  updateSectionManagementUI();
+  flashPreviewStatus('Summary updated successfully', 'status-success');
+  autoGeneratePreview('section-edit');
+}
+
+// PDF Preview Functions
+async function showPdfPreview() {
+  if (!state.currentHtml) {
+    return;
+  }
+
+  // Validate inputs so the preview matches the exported PDF
+  if (!validateJson()) {
+    return;
+  }
+
+  const selectedThemeObj = state.themes.find(t => t.name === state.selectedTheme);
+  const needsColor = selectedThemeObj && !selectedThemeObj.monochromatic;
+
+  if (needsColor && !state.selectedColor) {
+    showError('Please select a color for this theme');
+    return;
+  }
+
+  // Open modal immediately with a loading indicator
+  elements.pdfPreviewModal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  elements.pdfPreviewContainer.innerHTML = `
+    <div class="pdf-preview-placeholder">
+      <div class="pdf-preview-spinner"></div>
+      <p>Rendering a PDF preview...</p>
+    </div>
+  `;
+
+  try {
+    const filteredData = getFilteredResumeData();
+    const response = await fetch('/api/export-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        resumeData: filteredData,
+        themeName: state.selectedTheme,
+        colorName: state.selectedColor,
+        photoBase64: state.photoBase64,
+        customSectionNames: state.customSectionNames
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to generate PDF preview');
+    }
+
+    const blob = await response.blob();
+
+    if (state.pdfPreviewUrl) {
+      URL.revokeObjectURL(state.pdfPreviewUrl);
+    }
+
+    state.pdfPreviewUrl = window.URL.createObjectURL(blob);
+
+    const iframe = document.createElement('iframe');
+    iframe.src = `${state.pdfPreviewUrl}#view=FitH`;
+    iframe.className = 'pdf-preview-frame';
+    iframe.title = 'PDF Preview';
+    iframe.setAttribute('aria-label', 'PDF Preview');
+
+    elements.pdfPreviewContainer.innerHTML = '';
+    elements.pdfPreviewContainer.appendChild(iframe);
+  } catch (error) {
+    console.error('Error generating PDF preview:', error);
+    elements.pdfPreviewContainer.innerHTML = `
+      <div class="pdf-preview-placeholder error">
+        <p>Could not load the PDF preview.</p>
+        <p class="pdf-preview-error-detail">${error.message}</p>
+      </div>
+    `;
+  }
+}
+
+function closePdfPreview() {
+  elements.pdfPreviewModal.classList.remove('show');
+  document.body.style.overflow = 'auto';
+  elements.pdfPreviewContainer.innerHTML = '';
+
+  if (state.pdfPreviewUrl) {
+    window.URL.revokeObjectURL(state.pdfPreviewUrl);
+    state.pdfPreviewUrl = null;
   }
 }
 

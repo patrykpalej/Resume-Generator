@@ -20,12 +20,26 @@ function getStyles() {
       color: #333;
     }
 
-    .project-name a {
+    .project-link-line {
+      font-size: 13px;
       color: #000;
+      font-style: normal;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+
+    .project-link {
+      color: #000;
+      transition: color 0.2s;
+    }
+
+    .project-link:hover {
+      color: #666;
+      text-decoration: underline;
     }
 
     body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
       line-height: 1.6;
       color: #000;
       background: #fff;
@@ -68,7 +82,7 @@ function getStyles() {
 
     h1 {
       font-size: 36px;
-      color: #000;
+      color: #1a1a1a;
       margin-bottom: 5px;
       font-weight: 300;
       letter-spacing: 2px;
@@ -114,7 +128,6 @@ function getStyles() {
       border-bottom: none;
       padding-bottom: 8px;
       margin-bottom: 15px;
-      text-transform: uppercase;
       letter-spacing: 3px;
       font-weight: 400;
       page-break-after: avoid;
@@ -136,7 +149,7 @@ function getStyles() {
       page-break-inside: avoid;
     }
 
-    .experience-header, .education-header, .project-header {
+    .experience-header, .education-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
@@ -189,9 +202,10 @@ function getStyles() {
     }
 
     .skills-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
+      display: flex;
+      flex-wrap: nowrap;
       gap: 15px;
+      width: 95%;
     }
 
     .skill-category {
@@ -200,6 +214,8 @@ function getStyles() {
       padding-left: 0;
       border-radius: 0;
       border-left: none;
+      flex-shrink: 0;
+      min-width: 0;
     }
 
     .skill-category h3 {
@@ -226,6 +242,7 @@ function getStyles() {
       color: #000;
       border: none;
       font-weight: 300;
+      white-space: nowrap;
     }
 
     .skill-tag::after {
