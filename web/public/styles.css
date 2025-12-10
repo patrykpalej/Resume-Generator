@@ -1333,8 +1333,8 @@ body {
 }
 
 #addProjectBtn {
-  width: 25%;
-  height: 60px;
+  width: 16%;
+  height: 50px;
   min-height: 44px;
   align-self: center;
 }
@@ -1420,6 +1420,11 @@ body {
   transition: all 0.2s;
   height: 100%;
   overflow: auto;
+}
+
+.skill-list-item .experience-list-item-controls {
+  margin-top: auto;
+  padding-top: 8px;
 }
 
 .skill-list-item:hover {
@@ -1576,9 +1581,10 @@ body {
 
 /* Skill Form UI */
 .skill-items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 20px;
+  row-gap: 10px;
   margin-bottom: 6px;
 }
 
@@ -1773,15 +1779,15 @@ body {
 }
 
 #addExperienceBtn {
-  width: 25%;
-  height: 60px;
+  width: 16%;
+  height: 50px;
   min-height: 44px;
   align-self: center;
 }
 
 #addEducationBtn {
-  width: 25%;
-  height: 60px;
+  width: 16%;
+  height: 50px;
   min-height: 44px;
   align-self: center;
 }
