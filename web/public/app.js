@@ -21,6 +21,10 @@ const ALL_SECTIONS = ['personalInfo', 'summary', 'skills', 'experience', 'educat
 const FIXED_SECTIONS = ['personalInfo', 'summary', 'gdprClause']; // Cannot be reordered (fixed positions)
 const REQUIRED_SECTIONS = ['personalInfo']; // Cannot be disabled
 const REORDERABLE_SECTIONS = ['skills', 'experience', 'education', 'projects']; // Can be reordered
+const MIN_SKILL_FRACTION = 0.5;
+const MAX_SKILL_FRACTION = 5;
+const SKILL_FRACTION_STEP = 0.5;
+const MAX_SKILL_GROUPS = 3; // Limit skills groups shown/edited
 
 // DOM Elements
 const elements = {
@@ -64,6 +68,27 @@ const elements = {
   closeProjectFormBtn: document.getElementById('closeProjectFormBtn'),
   cancelProjectFormBtn: document.getElementById('cancelProjectFormBtn'),
   saveProjectFormBtn: document.getElementById('saveProjectFormBtn'),
+  // Skills Modal
+  skillsModal: document.getElementById('skillsModal'),
+  skillsList: document.getElementById('skillsList'),
+  addSkillBtn: document.getElementById('addSkillBtn'),
+  closeSkillsModalBtn: document.getElementById('closeSkillsModalBtn'),
+  closeSkillsModalFooterBtn: document.getElementById('closeSkillsModalFooterBtn'),
+  renameSkillsSectionBtn: document.getElementById('renameSkillsSectionBtn'),
+  skillsLimitPill: document.getElementById('skillsLimitPill'),
+  // Skill Form Modal
+  skillFormModal: document.getElementById('skillFormModal'),
+  skillFormTitle: document.getElementById('skillFormTitle'),
+  skillForm: document.getElementById('skillForm'),
+  skillFormError: document.getElementById('skillFormError'),
+  skillCategoryName: document.getElementById('skillCategoryName'),
+  skillFraction: document.getElementById('skillFraction'),
+  skillItemsList: document.getElementById('skillItemsList'),
+  skillsWeightsPanel: document.getElementById('skillsWeightsPanel'),
+  addSkillItemBtn: document.getElementById('addSkillItemBtn'),
+  closeSkillFormBtn: document.getElementById('closeSkillFormBtn'),
+  cancelSkillFormBtn: document.getElementById('cancelSkillFormBtn'),
+  saveSkillFormBtn: document.getElementById('saveSkillFormBtn'),
   experienceModal: document.getElementById('experienceModal'),
   experienceList: document.getElementById('experienceList'),
   addExperienceBtn: document.getElementById('addExperienceBtn'),
@@ -242,6 +267,24 @@ function setupEventListeners() {
   elements.addProjectBtn.addEventListener('click', addNewProject);
   // Note: renameProjectsSectionBtn listener is attached dynamically when modal opens
 
+  // Skills modal event listeners
+  elements.closeSkillsModalBtn.addEventListener('click', closeSkillsManagementModal);
+  elements.closeSkillsModalFooterBtn.addEventListener('click', closeSkillsManagementModal);
+  elements.addSkillBtn.addEventListener('click', addNewSkill);
+  if (elements.renameSkillsSectionBtn) {
+    elements.renameSkillsSectionBtn.addEventListener('click', () => renameSectionPrompt('skills'));
+  }
+
+  // Skill form modal event listeners
+  elements.closeSkillFormBtn.addEventListener('click', () => closeSkillFormModal());
+  elements.cancelSkillFormBtn.addEventListener('click', () => closeSkillFormModal());
+  elements.saveSkillFormBtn.addEventListener('click', saveSkillForm);
+  elements.addSkillItemBtn.addEventListener('click', () => addSkillItemField());
+  if (elements.skillFraction) {
+    elements.skillFraction.addEventListener('input', (e) => syncSkillFraction(Number(e.target.value)));
+    elements.skillFraction.addEventListener('change', (e) => syncSkillFraction(Number(e.target.value)));
+  }
+
   // Project form modal event listeners
   elements.closeProjectFormBtn.addEventListener('click', closeProjectFormModal);
   elements.cancelProjectFormBtn.addEventListener('click', closeProjectFormModal);
@@ -297,6 +340,18 @@ function setupEventListeners() {
   elements.projectsModal.addEventListener('click', (e) => {
     if (e.target === elements.projectsModal) {
       closeProjectsManagementModal();
+    }
+  });
+
+  elements.skillsModal.addEventListener('click', (e) => {
+    if (e.target === elements.skillsModal) {
+      closeSkillsManagementModal();
+    }
+  });
+
+  elements.skillFormModal.addEventListener('click', (e) => {
+    if (e.target === elements.skillFormModal) {
+      closeSkillFormModal();
     }
   });
 
@@ -367,6 +422,12 @@ function setupEventListeners() {
     }
     if (e.key === 'Escape' && elements.projectsModal.classList.contains('show')) {
       closeProjectsManagementModal();
+    }
+    if (e.key === 'Escape' && elements.skillsModal.classList.contains('show')) {
+      closeSkillsManagementModal();
+    }
+    if (e.key === 'Escape' && elements.skillFormModal.classList.contains('show')) {
+      closeSkillFormModal();
     }
     if (e.key === 'Escape' && elements.projectFormModal.classList.contains('show')) {
       closeProjectFormModal();
@@ -931,6 +992,11 @@ const validateJsonRealtime = debounce(() => {
   }
 }, 500); // Wait 500ms after user stops typing
 
+// Debounced preview after skill weight tweaks to avoid spamming renders
+const debouncedSkillPreview = debounce(() => {
+  autoGeneratePreview('section-edit');
+}, 400);
+
 // Section Editor Modal Functions
 function openSectionEditor(sectionKey) {
   state.currentEditingSection = sectionKey;
@@ -1296,7 +1362,9 @@ function updateSectionManagementUI() {
 
     toggleCheckbox.addEventListener('change', (e) => handleSectionToggle(sectionKey, e.target.checked));
     editBtn.addEventListener('click', () => {
-      if (sectionKey === 'projects') {
+      if (sectionKey === 'skills') {
+        openSkillsManagementModal();
+      } else if (sectionKey === 'projects') {
         openProjectsManagementModal();
       } else if (sectionKey === 'experience') {
         openExperienceManagementModal();
@@ -1401,6 +1469,10 @@ function renameSectionPrompt(sectionKey) {
     titleElement = elements.modalSectionTitle.querySelector('span');
     containerElement = elements.modalSectionTitle;
     existingRenameBtn = elements.modalSectionTitle.querySelector('.btn-rename-section-modal');
+  } else if (sectionKey === 'skills') {
+    titleElement = document.getElementById('skillsModalTitle');
+    containerElement = titleElement?.parentElement;
+    existingRenameBtn = document.getElementById('renameSkillsSectionBtn');
   } else if (sectionKey === 'projects') {
     titleElement = document.getElementById('projectsModalTitle');
     containerElement = titleElement.parentElement;
@@ -1495,6 +1567,8 @@ function renameSectionPrompt(sectionKey) {
       spanElement.id = 'experienceModalTitle';
     } else if (sectionKey === 'education') {
       spanElement.id = 'educationModalTitle';
+    } else if (sectionKey === 'skills') {
+      spanElement.id = 'skillsModalTitle';
     }
 
     // Replace the editing div with the restored span
@@ -1507,6 +1581,9 @@ function renameSectionPrompt(sectionKey) {
       // Clone and replace to remove old listeners, then add fresh one
       const newBtn = existingRenameBtn.cloneNode(true);
       existingRenameBtn.parentNode.replaceChild(newBtn, existingRenameBtn);
+      if (sectionKey === 'skills') {
+        elements.renameSkillsSectionBtn = newBtn;
+      }
 
       newBtn.addEventListener('click', () => {
         console.log('Pen icon clicked for section:', sectionKey);
@@ -1539,6 +1616,9 @@ function renameSectionPrompt(sectionKey) {
       // Clone and replace to remove old listeners, then add fresh one
       const newBtn = existingRenameBtn.cloneNode(true);
       existingRenameBtn.parentNode.replaceChild(newBtn, existingRenameBtn);
+      if (sectionKey === 'skills') {
+        elements.renameSkillsSectionBtn = newBtn;
+      }
 
       newBtn.addEventListener('click', () => {
         console.log('Pen icon clicked for section (after cancel):', sectionKey);
@@ -1609,6 +1689,24 @@ function updateSectionNameInModals(sectionKey, newName) {
         newRenameBtn.addEventListener('click', () => {
           console.log('Projects rename button clicked (after save)');
           renameSectionPrompt('projects');
+        });
+      }
+    }
+  }
+
+  // Update Skills modal title if open
+  if (sectionKey === 'skills') {
+    const titleEl = document.getElementById('skillsModalTitle');
+    if (titleEl) {
+      titleEl.textContent = newName;
+
+      const renameBtn = document.getElementById('renameSkillsSectionBtn');
+      if (renameBtn) {
+        const newBtn = renameBtn.cloneNode(true);
+        renameBtn.parentNode.replaceChild(newBtn, renameBtn);
+        elements.renameSkillsSectionBtn = newBtn;
+        newBtn.addEventListener('click', () => {
+          renameSectionPrompt('skills');
         });
       }
     }
@@ -1813,6 +1911,422 @@ function updateJsonOrder() {
   } catch (error) {
     console.error('Error updating JSON order:', error);
   }
+}
+
+// Skills Management Functions
+let currentEditingSkillIndex = null;
+
+function clampSkillFraction(value) {
+  if (!Number.isFinite(value)) return 1;
+  return Math.min(MAX_SKILL_FRACTION, Math.max(MIN_SKILL_FRACTION, value));
+}
+
+function syncSkillFraction(value) {
+  const clamped = clampSkillFraction(value);
+  if (elements.skillFraction) {
+    elements.skillFraction.value = clamped;
+  }
+  return clamped;
+}
+
+function sanitizeSkillsArray(skills) {
+  if (!Array.isArray(skills)) return [];
+
+  const sanitized = skills.map(category => {
+    const name = category?.name ? String(category.name).trim() : '';
+    const rawFraction = Number(category?.fraction);
+    const fraction = clampSkillFraction(Number.isFinite(rawFraction) && rawFraction > 0 ? parseFloat(rawFraction.toFixed(2)) : 1);
+    const items = Array.isArray(category?.items)
+      ? category.items.map(item => String(item).trim()).filter(Boolean)
+      : [];
+
+    return { name, fraction, items };
+  });
+
+  if (sanitized.length > MAX_SKILL_GROUPS) {
+    flashPreviewStatus('Skills are limited to the first 3 groups.', 'status-info');
+  }
+
+  return sanitized.slice(0, MAX_SKILL_GROUPS);
+}
+
+function openSkillsManagementModal() {
+  if (!state.resumeData) return;
+
+  // Ensure skills array exists and is sanitized
+  if (!Array.isArray(state.resumeData.skills)) {
+    state.resumeData.skills = [];
+  }
+
+  const cleanedSkills = sanitizeSkillsArray(state.resumeData.skills);
+  const lengthChanged = cleanedSkills.length !== (state.resumeData.skills?.length || 0);
+  state.resumeData.skills = cleanedSkills;
+
+  if (lengthChanged) {
+    elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+    state.jsonModified = true;
+    updateButtonStates();
+  }
+
+  populateSkillsList();
+
+  const sectionName = getCVHeaderName('skills');
+  const titleElement = document.getElementById('skillsModalTitle');
+  if (titleElement) {
+    titleElement.textContent = sectionName;
+  }
+
+  const renameBtnRef = elements.renameSkillsSectionBtn || document.getElementById('renameSkillsSectionBtn');
+  if (renameBtnRef && renameBtnRef.parentNode) {
+    const newRenameBtn = renameBtnRef.cloneNode(true);
+    renameBtnRef.parentNode.replaceChild(newRenameBtn, renameBtnRef);
+    newRenameBtn.addEventListener('click', () => renameSectionPrompt('skills'));
+    elements.renameSkillsSectionBtn = newRenameBtn;
+  }
+
+  elements.skillsModal.classList.add('show');
+}
+
+function closeSkillsManagementModal() {
+  elements.skillsModal.classList.remove('show');
+  updateSectionManagementUI();
+  debouncedSkillPreview();
+}
+
+function updateSkillsLimitUI(count) {
+  const atLimit = count >= MAX_SKILL_GROUPS;
+  if (elements.addSkillBtn) {
+    elements.addSkillBtn.disabled = atLimit;
+    elements.addSkillBtn.title = atLimit ? 'You can keep up to 3 skill groups' : '';
+  }
+
+  if (elements.skillsLimitPill) {
+    elements.skillsLimitPill.style.display = atLimit ? 'inline-flex' : 'none';
+  }
+}
+
+function populateSkillsList() {
+  const skills = sanitizeSkillsArray(state.resumeData?.skills || []);
+  const previousJson = elements.jsonEditor.value;
+  state.resumeData.skills = skills;
+  const newJson = JSON.stringify(state.resumeData, null, 2);
+  elements.jsonEditor.value = newJson;
+  if (newJson !== previousJson) {
+    state.jsonModified = true;
+    updateButtonStates();
+  }
+
+  updateSkillsLimitUI(skills.length);
+
+  if (!skills.length) {
+    elements.skillsList.innerHTML = '<p class="skill-list-empty">No skills yet. Click "Add Skill Group" to start.</p>';
+    return;
+  }
+
+  const totalFraction = skills.reduce((sum, skill) => sum + (Number(skill.fraction) || 1), 0) || skills.length || 1;
+
+  elements.skillsList.innerHTML = skills.map((skill, index) => {
+    const fraction = Number(skill.fraction) || 1;
+    const share = Math.round((fraction / totalFraction) * 100);
+    const itemsMarkup = skill.items && skill.items.length
+      ? skill.items.map(item => `<span class="skill-tag">${item}</span>`).join('')
+      : '<span class="skill-tag" style="opacity: 0.7;">Add at least one item</span>';
+
+    return `
+    <div class="skill-list-item-row" data-skill-index="${index}" style="height: ${120 + (fraction - 1) * 40}px;">
+      <div class="skill-list-item">
+        <div class="skill-list-header">
+          <div class="skill-list-title">
+            <div class="skill-list-name">${skill.name || 'Untitled group'}</div>
+          </div>
+          <div class="skill-list-meta">${skill.items?.length || 0} item${(skill.items?.length || 0) === 1 ? '' : 's'}</div>
+        </div>
+        <div class="skill-tags">
+          ${itemsMarkup}
+        </div>
+        <div class="experience-list-item-controls">
+          <button class="btn btn-secondary btn-small" onclick="openSkillEditor(${index})">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <button class="btn btn-danger btn-small" onclick="deleteSkill(${index})">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    `;
+  }).join('');
+
+  renderSkillWeightsPanel(skills, totalFraction);
+
+}
+
+function openSkillEditor(skillIndex) {
+  currentEditingSkillIndex = skillIndex;
+  const skill = state.resumeData.skills[skillIndex];
+
+  elements.skillFormTitle.textContent = `Edit Skill Group: ${skill.name || 'Untitled'}`;
+  elements.skillCategoryName.value = skill.name || '';
+
+  populateSkillItems(skill.items || []);
+
+  elements.skillsModal.classList.remove('show');
+  elements.skillFormModal.classList.add('show');
+}
+
+function addNewSkill() {
+  const skillsCount = Array.isArray(state.resumeData?.skills) ? state.resumeData.skills.length : 0;
+  if (skillsCount >= MAX_SKILL_GROUPS) {
+    flashPreviewStatus('You can keep up to 3 skill groups. Remove one to add another.', 'status-error');
+    return;
+  }
+
+  if (!Array.isArray(state.resumeData.skills)) {
+    state.resumeData.skills = [];
+  }
+
+  currentEditingSkillIndex = null;
+  elements.skillFormTitle.textContent = 'Add Skill Group';
+  elements.skillCategoryName.value = '';
+  populateSkillItems([]);
+  hideSkillFormError();
+
+  elements.skillsModal.classList.remove('show');
+  elements.skillFormModal.classList.add('show');
+}
+
+function deleteSkill(skillIndex) {
+  if (!confirm('Are you sure you want to delete this skill group?')) return;
+
+  state.resumeData.skills.splice(skillIndex, 1);
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+
+  populateSkillsList();
+  flashPreviewStatus('Skill group deleted', 'status-success');
+  debouncedSkillPreview();
+}
+
+function closeSkillFormModal(reopenList = true) {
+  elements.skillFormModal.classList.remove('show');
+  currentEditingSkillIndex = null;
+  elements.skillForm.reset();
+  elements.skillItemsList.innerHTML = '';
+  hideSkillFormError();
+
+  if (reopenList) {
+    elements.skillsModal.classList.add('show');
+  }
+}
+
+function showSkillFormError(message) {
+  elements.skillFormError.textContent = message;
+  elements.skillFormError.classList.add('show');
+}
+
+function hideSkillFormError() {
+  elements.skillFormError.textContent = '';
+  elements.skillFormError.classList.remove('show');
+}
+
+function saveSkillForm() {
+  hideSkillFormError();
+
+  const name = elements.skillCategoryName.value.trim();
+
+  // Keep existing fraction if editing, otherwise default to 1
+  let fraction = 1;
+  if (currentEditingSkillIndex !== null && state.resumeData.skills[currentEditingSkillIndex]) {
+    fraction = state.resumeData.skills[currentEditingSkillIndex].fraction || 1;
+  }
+
+  if (!name) {
+    showSkillFormError('Please provide a group name.');
+    return;
+  }
+
+  const items = [];
+  elements.skillItemsList.querySelectorAll('.skill-item input[type="text"]').forEach(input => {
+    const value = input.value.trim();
+    if (value) items.push(value);
+  });
+
+  if (items.length === 0) {
+    showSkillFormError('Add at least one item to this group.');
+    return;
+  }
+
+  const skills = Array.isArray(state.resumeData.skills) ? state.resumeData.skills : [];
+  if (currentEditingSkillIndex === null && skills.length >= MAX_SKILL_GROUPS) {
+    showSkillFormError('You can keep up to 3 skill groups. Remove one to add another.');
+    return;
+  }
+
+  const skillData = {
+    name,
+    fraction: parseFloat(fraction.toFixed(2)),
+    items
+  };
+
+  if (currentEditingSkillIndex !== null) {
+    state.resumeData.skills[currentEditingSkillIndex] = skillData;
+    flashPreviewStatus('Skill group updated', 'status-success');
+  } else {
+    state.resumeData.skills.push(skillData);
+    flashPreviewStatus('Skill group added', 'status-success');
+
+    // Automatically enable skills section when creating the first group
+    if (state.enabledSections && state.enabledSections.skills === false) {
+      state.enabledSections.skills = true;
+    } else if (state.enabledSections && state.enabledSections.skills === undefined) {
+      state.enabledSections.skills = true;
+    }
+  }
+
+  state.sectionErrors.skills = false;
+  state.resumeData.skills = sanitizeSkillsArray(state.resumeData.skills);
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+  updateButtonStates();
+
+  closeSkillFormModal(false);
+  populateSkillsList();
+  elements.skillsModal.classList.add('show');
+  debouncedSkillPreview();
+}
+
+function populateSkillItems(items) {
+  elements.skillItemsList.innerHTML = '';
+
+  if (!items || items.length === 0) {
+    addSkillItemField();
+    addSkillItemField();
+    return;
+  }
+
+  items.forEach(item => addSkillItemField(item));
+}
+
+function addSkillItemField(text = '') {
+  const safeValue = text
+    ? text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+    : '';
+  const item = document.createElement('div');
+  item.className = 'skill-item';
+  item.innerHTML = `
+    <input type="text" value="${safeValue}" placeholder="e.g., React, Docker, English (C1)">
+    <button type="button" class="btn-icon" onclick="removeSkillItem(this)" title="Remove">
+      <i class="fas fa-trash"></i>
+    </button>
+  `;
+  elements.skillItemsList.appendChild(item);
+}
+
+function removeSkillItem(button) {
+  const item = button.closest('.skill-item');
+  if (item) {
+    item.remove();
+  }
+}
+
+function updateSkillFractionInline(index, value, showStatus = false) {
+  if (!Array.isArray(state.resumeData.skills)) return;
+  const clamped = clampSkillFraction(value);
+  if (!state.resumeData.skills[index]) return;
+
+  state.resumeData.skills[index].fraction = clamped;
+  elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+  state.jsonModified = true;
+  updateButtonStates();
+
+  // Sync slider and pill text
+  const slider = elements.skillsWeightsPanel?.querySelector(`.skill-weight-slider[data-skill-index="${index}"]`);
+  if (slider) slider.value = clamped;
+  refreshSkillFractionPills();
+  updateSkillCardWidths();
+
+  if (showStatus) {
+    flashPreviewStatus('Updated column weights for skills', 'status-success');
+  }
+
+  debouncedSkillPreview();
+}
+
+function refreshSkillFractionPills() {
+  const skills = state.resumeData?.skills || [];
+  if (!skills.length) return;
+  const totalFraction = skills.reduce((sum, skill) => sum + (Number(skill.fraction) || 1), 0) || skills.length || 1;
+
+  skills.forEach((skill, index) => {
+    const fraction = Number(skill.fraction) || 1;
+    const share = Math.round((fraction / totalFraction) * 100);
+    const pill = elements.skillsWeightsPanel?.querySelector(`.skill-weight-pill[data-skill-index="${index}"]`);
+    if (pill) {
+      pill.innerHTML = `<i class="fas fa-ruler-horizontal"></i> ${fraction}x • ${share}% width`;
+    }
+  });
+}
+
+function renderSkillWeightsPanel(skills, totalFraction) {
+  if (!elements.skillsWeightsPanel) return;
+  if (!skills.length) {
+    elements.skillsWeightsPanel.innerHTML = '';
+    return;
+  }
+
+  const rows = skills.map((skill, index) => {
+    const fraction = Number(skill.fraction) || 1;
+    const height = 120 + (fraction - 1) * 40;
+    return `
+      <div class="skill-weight-row">
+        <div class="skill-weight-name" title="${skill.name || 'Untitled group'}">${skill.name || 'Untitled group'}</div>
+        <input class="skill-weight-slider" type="range"
+               min="${MIN_SKILL_FRACTION}" max="${MAX_SKILL_FRACTION}" step="${SKILL_FRACTION_STEP}"
+               value="${fraction}" data-skill-index="${index}">
+        <span class="skill-weight-pill" data-skill-index="${index}"><i class="fas fa-ruler-vertical"></i> ${fraction}x • ${height}px height</span>
+      </div>
+    `;
+  }).join('');
+
+  elements.skillsWeightsPanel.innerHTML = `
+    <div class="skills-weights-panel-title">Adjust row heights</div>
+    ${rows}
+  `;
+
+  // Attach handlers
+  const sliders = elements.skillsWeightsPanel.querySelectorAll('.skill-weight-slider');
+  sliders.forEach(slider => {
+    slider.addEventListener('input', (e) => {
+      const idx = parseInt(e.target.dataset.skillIndex, 10);
+      const val = parseFloat(e.target.value);
+      updateSkillFractionInline(idx, val, false);
+    });
+    slider.addEventListener('change', (e) => {
+      const idx = parseInt(e.target.dataset.skillIndex, 10);
+      const val = parseFloat(e.target.value);
+      updateSkillFractionInline(idx, val, true);
+    });
+  });
+
+  updateSkillCardWidths();
+}
+
+function updateSkillCardWidths() {
+  const skills = state.resumeData?.skills || [];
+  if (!skills.length || !elements.skillsList) return;
+
+  skills.forEach((skill, index) => {
+    const fraction = Number(skill.fraction) || 1;
+    const height = 120 + (fraction - 1) * 40;
+    const row = elements.skillsList.querySelector(`.skill-list-item-row[data-skill-index="${index}"]`);
+    if (row) {
+      row.style.height = `${height}px`;
+    }
+  });
 }
 
 // Projects Management Functions

@@ -1343,6 +1343,295 @@ body {
   justify-content: flex-end;
 }
 
+/* Skills Management UI */
+.skills-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 420px;
+}
+
+.skills-hint-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.skills-hint {
+  line-height: 1.4;
+}
+
+.skills-limit-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(91, 124, 153, 0.12);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.skills-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+  flex: 0 0 auto;
+  overflow: visible;
+  padding: 2px 0 6px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.skill-list-item-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 120px;
+  max-height: 250px;
+}
+
+.skill-list-item-row.dragging {
+  opacity: 0.85;
+}
+
+.skill-list-item-row.drag-over .skill-list-item {
+  border-style: dashed;
+}
+
+.skill-list-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: all 0.2s;
+  height: 100%;
+  overflow: auto;
+}
+
+.skill-list-item:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent-secondary);
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.skill-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.skill-list-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skill-list-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.skill-fraction-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 11px;
+  width: fit-content;
+}
+
+.skill-list-meta {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 11px;
+}
+
+.skill-tags .skill-tag:last-child {
+  margin-right: 0;
+}
+
+.skill-list-empty {
+  color: var(--text-secondary);
+  padding: 20px;
+  text-align: center;
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+}
+
+#addSkillBtn {
+  width: 32%;
+  height: 60px;
+  min-height: 44px;
+  align-self: center;
+}
+
+#skillsModal .modal-footer {
+  justify-content: flex-end;
+}
+
+.skills-weights-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.skills-weights-panel-title {
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.skill-weight-row {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.skill-weight-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.skill-weight-slider {
+  width: 100%;
+  accent-color: var(--accent-primary);
+  height: 6px;
+}
+
+.skill-weight-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  font-weight: 700;
+  color: var(--text-secondary);
+  min-width: 105px;
+  justify-content: center;
+  font-size: 12px;
+}
+
+#skillFormModal .modal-content {
+  max-width: 720px;
+}
+
+.skills-form {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Skill Form UI */
+.skill-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.skill-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skill-item input[type="text"] {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.skill-item input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.skill-item .btn-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #a44;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.skill-item .btn-icon:hover {
+  background: #933;
+}
+
+.skill-items-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 /* Experience Management UI */
 .experience-list-container {
   display: flex;
@@ -1530,9 +1819,15 @@ body {
   color: var(--text-primary);
 }
 
+.field-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
 .form-field input[type="text"],
 .form-field input[type="month"],
-.form-field input[type="email"] {
+.form-field input[type="email"],
+.form-field input[type="number"] {
   padding: 10px 12px;
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -1545,9 +1840,75 @@ body {
 
 .form-field input[type="text"]:focus,
 .form-field input[type="month"]:focus,
-.form-field input[type="email"]:focus {
+.form-field input[type="email"]:focus,
+.form-field input[type="number"]:focus {
   outline: none;
   border-color: var(--accent-primary);
+}
+
+.form-field input[type="number"]::-webkit-outer-spin-button,
+.form-field input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.form-field input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.fraction-input {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.fraction-input input[type="range"] {
+  accent-color: var(--accent-primary);
+  width: 100%;
+}
+
+.fraction-value-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-primary);
+  min-width: 110px;
+}
+
+.fraction-value-pill input[type="number"] {
+  width: 56px;
+  border: none;
+  background: transparent;
+  padding: 6px 4px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.fraction-value-pill input[type="number"]:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.fraction-unit {
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.skill-fraction-control-inline {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.skill-fraction-control-inline .skill-fraction-slider {
+  width: 100%;
 }
 
 .form-field textarea {

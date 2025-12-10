@@ -204,6 +204,91 @@
     </div>
   </div>
 
+  <!-- Skills Management Modal -->
+  <div id="skillsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <span id="skillsModalTitle">💡 Skills</span>
+          <button class="btn-rename-section-modal" id="renameSkillsSectionBtn" title="Rename section">
+            <i class="fas fa-pen"></i>
+          </button>
+        </h2>
+        <button id="closeSkillsModalBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="skills-list-container">
+          <div class="skills-hint-row">
+            <p class="skills-hint">Organize skills into up to three groups. Fractions decide how much space each group takes on the resume.</p>
+            <span id="skillsLimitPill" class="skills-limit-pill" style="display: none;">Max 3 groups</span>
+          </div>
+          <div id="skillsList" class="skills-list">
+            <!-- Skills will be populated here -->
+          </div>
+          <div id="skillsWeightsPanel" class="skills-weights-panel">
+            <!-- Inline weight controls will be populated here -->
+          </div>
+          <button id="addSkillBtn" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Skill Group
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="closeSkillsModalFooterBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skill Form Modal -->
+  <div id="skillFormModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <i class="fas fa-lightbulb"></i>
+          <span id="skillFormTitle">Add Skill Group</span>
+        </h2>
+        <button id="closeSkillFormBtn" class="btn-icon modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="skillFormError" class="modal-error-message"></div>
+        <form id="skillForm" class="experience-form skills-form">
+          <div class="form-field">
+            <label for="skillCategoryName">Group name *</label>
+            <input type="text" id="skillCategoryName" required placeholder="e.g., Frontend, Backend, Languages">
+            <small class="field-hint">Use a short title that describes this set of skills.</small>
+          </div>
+
+          <div class="form-field">
+            <label>Items in this group *</label>
+            <div id="skillItemsList" class="skill-items-list">
+              <!-- Skill items will be populated here -->
+            </div>
+            <div class="skill-items-actions">
+              <button type="button" id="addSkillItemBtn" class="btn btn-secondary btn-small">
+                <i class="fas fa-plus"></i> Add another item
+              </button>
+              <span class="field-hint">Examples: React, Docker, English (C1)</span>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelSkillFormBtn" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button id="saveSkillFormBtn" class="btn btn-primary">
+          <i class="fas fa-check"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Experience Management Modal -->
   <div id="experienceModal" class="modal">
     <div class="modal-content">
