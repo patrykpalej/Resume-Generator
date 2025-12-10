@@ -1498,10 +1498,11 @@ body {
 }
 
 #addSkillBtn {
-  width: 32%;
-  height: 60px;
+  width: 16%;
+  height: 50px;
   min-height: 44px;
   align-self: center;
+  margin-top: 30px;
 }
 
 #skillsModal .modal-footer {

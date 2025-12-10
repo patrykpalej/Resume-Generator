@@ -24,7 +24,7 @@ const REORDERABLE_SECTIONS = ['skills', 'experience', 'education', 'projects']; 
 const MIN_SKILL_FRACTION = 0.5;
 const MAX_SKILL_FRACTION = 5;
 const SKILL_FRACTION_STEP = 0.5;
-const MAX_SKILL_GROUPS = 3; // Limit skills groups shown/edited
+const MAX_SKILL_GROUPS = 4; // Limit skills groups shown/edited
 
 // DOM Elements
 const elements = {
@@ -1997,7 +1997,7 @@ function updateSkillsLimitUI(count) {
   const atLimit = count >= MAX_SKILL_GROUPS;
   if (elements.addSkillBtn) {
     elements.addSkillBtn.disabled = atLimit;
-    elements.addSkillBtn.title = atLimit ? 'You can keep up to 3 skill groups' : '';
+    elements.addSkillBtn.title = atLimit ? 'You can keep up to 4 skill groups' : '';
   }
 
   if (elements.skillsLimitPill) {
@@ -2077,7 +2077,7 @@ function openSkillEditor(skillIndex) {
 function addNewSkill() {
   const skillsCount = Array.isArray(state.resumeData?.skills) ? state.resumeData.skills.length : 0;
   if (skillsCount >= MAX_SKILL_GROUPS) {
-    flashPreviewStatus('You can keep up to 3 skill groups. Remove one to add another.', 'status-error');
+    flashPreviewStatus('You can keep up to 4 skill groups. Remove one to add another.', 'status-error');
     return;
   }
 
@@ -2158,7 +2158,7 @@ function saveSkillForm() {
 
   const skills = Array.isArray(state.resumeData.skills) ? state.resumeData.skills : [];
   if (currentEditingSkillIndex === null && skills.length >= MAX_SKILL_GROUPS) {
-    showSkillFormError('You can keep up to 3 skill groups. Remove one to add another.');
+    showSkillFormError('You can keep up to 4 skill groups. Remove one to add another.');
     return;
   }
 

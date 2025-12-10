@@ -61,8 +61,8 @@ function generateEducationSection(education, sectionName = '🎓 Education') {
 function generateSkillsSection(skills, sectionName = '💡 Skills') {
   if (!skills || !Array.isArray(skills) || skills.length === 0) return '';
 
-  // Limit to maximum 3 categories
-  const limitedSkills = skills.slice(0, 3);
+  // Limit to maximum 4 categories
+  const limitedSkills = skills.slice(0, 4);
 
   // Calculate total fraction sum
   const totalFraction = limitedSkills.reduce((sum, category) => sum + (category.fraction || 1), 0);
