@@ -2033,7 +2033,7 @@ function populateSkillsList() {
       : '<span class="skill-tag" style="opacity: 0.7;">Add at least one item</span>';
 
     return `
-    <div class="skill-list-item-row" data-skill-index="${index}" style="height: ${120 + (fraction - 1) * 40}px;">
+    <div class="skill-list-item-row" data-skill-index="${index}" style="flex: 0 0 ${share}%; max-width: ${share}%;">
       <div class="skill-list-item">
         <div class="skill-list-header">
           <div class="skill-list-title">
@@ -2280,20 +2280,20 @@ function renderSkillWeightsPanel(skills, totalFraction) {
 
   const rows = skills.map((skill, index) => {
     const fraction = Number(skill.fraction) || 1;
-    const height = 120 + (fraction - 1) * 40;
+    const share = Math.round((fraction / totalFraction) * 100);
     return `
       <div class="skill-weight-row">
         <div class="skill-weight-name" title="${skill.name || 'Untitled group'}">${skill.name || 'Untitled group'}</div>
         <input class="skill-weight-slider" type="range"
                min="${MIN_SKILL_FRACTION}" max="${MAX_SKILL_FRACTION}" step="${SKILL_FRACTION_STEP}"
                value="${fraction}" data-skill-index="${index}">
-        <span class="skill-weight-pill" data-skill-index="${index}"><i class="fas fa-ruler-vertical"></i> ${fraction}x • ${height}px height</span>
+        <span class="skill-weight-pill" data-skill-index="${index}"><i class="fas fa-ruler-horizontal"></i> ${fraction}x • ${share}% width</span>
       </div>
     `;
   }).join('');
 
   elements.skillsWeightsPanel.innerHTML = `
-    <div class="skills-weights-panel-title">Adjust row heights</div>
+    <div class="skills-weights-panel-title">Adjust column widths</div>
     ${rows}
   `;
 
@@ -2318,13 +2318,15 @@ function renderSkillWeightsPanel(skills, totalFraction) {
 function updateSkillCardWidths() {
   const skills = state.resumeData?.skills || [];
   if (!skills.length || !elements.skillsList) return;
+  const totalFraction = skills.reduce((sum, skill) => sum + (Number(skill.fraction) || 1), 0) || skills.length || 1;
 
   skills.forEach((skill, index) => {
     const fraction = Number(skill.fraction) || 1;
-    const height = 120 + (fraction - 1) * 40;
+    const share = Math.round((fraction / totalFraction) * 100);
     const row = elements.skillsList.querySelector(`.skill-list-item-row[data-skill-index="${index}"]`);
     if (row) {
-      row.style.height = `${height}px`;
+      row.style.flex = `0 0 ${share}%`;
+      row.style.maxWidth = `${share}%`;
     }
   });
 }
