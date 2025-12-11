@@ -212,42 +212,34 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
     personalInfo.location ? { text: personalInfo.location, length: personalInfo.location.length } : null
   ].filter(Boolean);
 
-  // Calculate contact grid column widths based on actual content (3 columns)
-  // Items flow into 3 columns: indices 0,3,... go to column 1, indices 1,4,... go to column 2, indices 2,5,... go to column 3
+  // Calculate contact grid column widths based on actual content (2 columns)
+  // Items flow into 2 columns: indices 0,2,4,... go to column 1, indices 1,3,5,... go to column 2
   let contactCol1Length = 0;
   let contactCol2Length = 0;
-  let contactCol3Length = 0;
   contactItemsArray.forEach((item, index) => {
-    const col = index % 3;
-    if (col === 0) {
+    if (index % 2 === 0) {
       contactCol1Length += item.length;
-    } else if (col === 1) {
-      contactCol2Length += item.length;
     } else {
-      contactCol3Length += item.length;
+      contactCol2Length += item.length;
     }
   });
 
   // Calculate contact grid column fractions
   let contactGridCol1Fraction = 1;
   let contactGridCol2Fraction = 1;
-  let contactGridCol3Fraction = 1;
-  const totalContactLength = contactCol1Length + contactCol2Length + contactCol3Length;
+  const totalContactLength = contactCol1Length + contactCol2Length;
   if (totalContactLength > 0) {
     contactGridCol1Fraction = contactCol1Length / totalContactLength;
     contactGridCol2Fraction = contactCol2Length / totalContactLength;
-    contactGridCol3Fraction = contactCol3Length / totalContactLength;
 
-    // Ensure minimum column widths (at least 20% each for 3 columns)
-    if (contactGridCol1Fraction < 0.2) contactGridCol1Fraction = 0.2;
-    if (contactGridCol2Fraction < 0.2) contactGridCol2Fraction = 0.2;
-    if (contactGridCol3Fraction < 0.2) contactGridCol3Fraction = 0.2;
+    // Ensure minimum column widths (at least 30% each for 2 columns)
+    if (contactGridCol1Fraction < 0.3) contactGridCol1Fraction = 0.3;
+    if (contactGridCol2Fraction < 0.3) contactGridCol2Fraction = 0.3;
 
     // Normalize
-    const contactNormalizedTotal = contactGridCol1Fraction + contactGridCol2Fraction + contactGridCol3Fraction;
+    const contactNormalizedTotal = contactGridCol1Fraction + contactGridCol2Fraction;
     contactGridCol1Fraction /= contactNormalizedTotal;
     contactGridCol2Fraction /= contactNormalizedTotal;
-    contactGridCol3Fraction /= contactNormalizedTotal;
   }
 
   return `<!DOCTYPE html>
@@ -264,7 +256,7 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
 </head>
 <body>
   <div class="content-wrapper">
-    <header style="--contact-grid-col1-fraction: ${contactGridCol1Fraction}; --contact-grid-col2-fraction: ${contactGridCol2Fraction}; --contact-grid-col3-fraction: ${contactGridCol3Fraction};">
+    <header style="--contact-grid-col1-fraction: ${contactGridCol1Fraction}; --contact-grid-col2-fraction: ${contactGridCol2Fraction};">
       <div class="header-name">
         <h1>${personalInfo.name}</h1>
       </div>

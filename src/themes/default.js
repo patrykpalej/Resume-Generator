@@ -97,13 +97,13 @@ function getStyles(palette) {
     }
 
     .header-contacts {
-      grid-column: 3;
+      grid-column: 1;
       grid-row: 3;
     }
 
     .contact-grid {
       display: grid;
-      grid-template-columns: var(--contact-grid-col1-fraction, 1)fr var(--contact-grid-col2-fraction, 1)fr var(--contact-grid-col3-fraction, 1)fr;
+      grid-template-columns: var(--contact-grid-col1-fraction, 1)fr var(--contact-grid-col2-fraction, 1)fr;
       gap: 8px 12px;
     }
 
@@ -111,11 +111,16 @@ function getStyles(palette) {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 14px;
+      font-size: 13px;
       color: #555;
       min-width: 0;
+      max-width: 100%;
       overflow-wrap: break-word;
       word-break: break-word;
+    }
+
+    .contact-item > * {
+      min-width: 0;
     }
 
     .contact-item i {
