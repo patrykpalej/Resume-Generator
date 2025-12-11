@@ -20,6 +20,11 @@ A simple tool to create professional-looking resumes from JSON data. Write your 
 npm install
 ```
 
+If emojis appear as boxes on a Linux server, install a color emoji font (the Docker image now does this automatically):
+```bash
+sudo apt-get update && sudo apt-get install -y fonts-noto-color-emoji
+```
+
 ### Create Your Resume
 
 1. **Prepare your data**: Copy `data/resume-data-example.json` to `data/resume-data.json` and edit it with your information

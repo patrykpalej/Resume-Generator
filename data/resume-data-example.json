@@ -1,12 +1,12 @@
 {
   "personalInfo": {
-    "name": "Alex Smith",
-    "title": "Software Engineer",
-    "email": "alex.smith@example.com",
-    "phone": "+1 555-123-4567",
-    "website": "alexsmith.dev",
-    "linkedin": "linkedin.com/in/alex-smith",
-    "github": "github.com/alexsmith"
+    "name": "Your Name",
+    "title": "Your Role",
+    "email": "your@email.com",
+    "phone": "+48 123 456 789",
+    "website": "yourwebsite.com",
+    "linkedin": "linkedin.com/in/your-linkedin",
+    "github": "github.com/your-github"
   },
   "summary": "Full-stack engineer who enjoys shipping reliable web applications and collaborating across teams.",
   "skills": [

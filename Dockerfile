@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     ca-certificates \
     fonts-liberation \
+    fonts-noto-color-emoji \
+    fontconfig \
     libappindicator3-1 \
     libasound2 \
     libatk-bridge2.0-0 \
@@ -23,6 +25,7 @@ RUN apt-get update && apt-get install -y \
     libgbm1 \
     libxshmfence1 \
     --no-install-recommends \
+    && fc-cache -f \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

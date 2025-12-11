@@ -52,6 +52,8 @@ npm install
 cd ..
 ```
 
+> Emoji rendering: If emojis show up as empty squares on Linux, install a color emoji font (e.g., `fonts-noto-color-emoji` on Debian/Ubuntu). The provided Docker image installs this automatically.
+
 2. Start the server:
 ```bash
 npm run start:web
