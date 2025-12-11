@@ -41,14 +41,36 @@
           <span class="logo-link-text">Source Code</span>
           <i class="fas fa-external-link-alt external-icon"></i>
         </a>
-        <span class="badge-info"><span class="badge-emoji">🛡️</span> Browser-only. No personal data is stored on the server!</span>
+        <div class="privacy-badge-wrapper">
+          <div class="privacy-badge">
+            <span class="badge-emoji">🛡️</span>
+            <span class="badge-text">Privacy & Data Processing</span>
+            <i class="fas fa-info-circle info-icon"></i>
+          </div>
+          <div class="privacy-tooltip">
+            <div class="tooltip-content">
+              <p class="tooltip-title"><strong>What we process:</strong></p>
+              <p>• Resume data & photos (temporarily)</p>
+              <p>• Server-side HTML/PDF generation</p>
+              <p class="tooltip-title"><strong>What we store:</strong></p>
+              <p>• Nothing permanently</p>
+              <p>• Temp files deleted instantly</p>
+              <p class="tooltip-footer">
+                <a href="/terms-and-conditions.html" target="_blank" rel="noopener noreferrer">
+                  <i class="fas fa-file-contract"></i> Read Full Terms & Privacy Policy
+                </a>
+              </p>
+              <p class="tooltip-accept">By using this service, you accept our terms.</p>
+            </div>
+          </div>
+        </div>
         <a class="logo-link gallery-link" href="/gallery" target="_blank" rel="noopener noreferrer">
           <i class="fas fa-images"></i>
           <span class="logo-link-text">See Gallery</span>
           <i class="fas fa-external-link-alt external-icon"></i>
         </a>
       </div>
-      <div class="logo-divider"></div>
+      <p class="app-description">Lightweight JSON oriented interactive resume generator for IT professionals</p>
 
       <div class="control-section">
         <div class="button-group button-row">
@@ -96,7 +118,7 @@
       <!-- Hidden textarea for internal JSON storage -->
       <textarea id="jsonEditor" style="display: none;"></textarea>
 
-      <div class="control-section">
+      <div class="control-section appearance-section">
         <h3>Appearance</h3>
         <div class="appearance-grid">
           <div class="form-group">

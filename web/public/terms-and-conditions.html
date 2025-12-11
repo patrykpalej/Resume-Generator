@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms and Conditions - Resume Generator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #f5f7fa;
+      --bg-secondary: #ffffff;
+      --text-primary: #2c3e50;
+      --text-secondary: #5a6c7d;
+      --text-muted: #95a5a6;
+      --border-color: #d1d9e0;
+      --accent-primary: #5b7c99;
+      --accent-secondary: #7fa1c3;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--bg-secondary);
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .header i {
+      font-size: 32px;
+      color: var(--accent-primary);
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 32px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h2 i {
+      font-size: 18px;
+      color: var(--accent-primary);
+    }
+
+    p, li {
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    ul {
+      margin-left: 24px;
+      margin-bottom: 16px;
+    }
+
+    .highlight-box {
+      background: #e6f4ea;
+      border-left: 4px solid #52b788;
+      padding: 16px;
+      border-radius: 4px;
+      margin: 24px 0;
+    }
+
+    .highlight-box p {
+      margin-bottom: 0;
+      color: #1b6e2d;
+      font-weight: 500;
+    }
+
+    .warning-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 16px;
+      border-radius: 4px;
+      margin: 24px 0;
+    }
+
+    .warning-box p {
+      margin-bottom: 8px;
+      color: #856404;
+    }
+
+    .warning-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-weight: 500;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .back-link:hover {
+      color: var(--accent-secondary);
+    }
+
+    .date {
+      color: var(--text-muted);
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    code {
+      background: var(--bg-primary);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 14px;
+      color: var(--accent-primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <i class="fas fa-shield-alt"></i>
+      <h1>Privacy Policy & Terms of Service</h1>
+    </div>
+
+    <div class="highlight-box">
+      <p><i class="fas fa-info-circle"></i> By using this Resume Generator service, you acknowledge and accept these terms and our data processing practices.</p>
+    </div>
+
+    <h2><i class="fas fa-database"></i> 1. What Data We Process</h2>
+    <p>When you use this Resume Generator, we temporarily process the following personal data:</p>
+    <ul>
+      <li><strong>Resume content:</strong> Name, contact information (email, phone, location), work experience, education, skills, projects, professional summary</li>
+      <li><strong>Photos:</strong> Professional photos you upload (processed as base64-encoded images)</li>
+      <li><strong>Custom preferences:</strong> Selected theme, color scheme, section customizations</li>
+    </ul>
+
+    <h2><i class="fas fa-cogs"></i> 2. How We Process Your Data</h2>
+    <p><strong>HTML Preview Generation:</strong></p>
+    <ul>
+      <li>Your resume data is sent to our server for HTML rendering</li>
+      <li>The server generates a formatted HTML preview using your selected theme and colors</li>
+      <li>The HTML is returned to your browser for display</li>
+      <li>No data is saved to disk or database during this process</li>
+    </ul>
+
+    <p><strong>PDF Export:</strong></p>
+    <ul>
+      <li>When you click "Export PDF", your data is sent to the server</li>
+      <li>A temporary PDF file is created using Puppeteer (headless browser)</li>
+      <li>The PDF is immediately sent to you as a download</li>
+      <li>The temporary file is deleted from the server immediately after download</li>
+    </ul>
+
+    <div class="highlight-box">
+      <p><i class="fas fa-check-circle"></i> <strong>Privacy Guarantee:</strong> We do NOT store your resume data permanently. All processing is temporary and data is deleted immediately after use.</p>
+    </div>
+
+    <h2><i class="fas fa-clock"></i> 3. Data Retention</h2>
+    <ul>
+      <li><strong>Resume data:</strong> Processed in-memory only, never written to permanent storage</li>
+      <li><strong>Temporary PDF files:</strong> Stored for less than 1 second (deleted after download completes)</li>
+      <li><strong>Your browser data:</strong> All your resume data remains in your browser's local memory until you close the page</li>
+    </ul>
+
+    <h2><i class="fas fa-chart-line"></i> 4. Analytics & Tracking</h2>
+    <div class="warning-box">
+      <p><strong><i class="fas fa-exclamation-triangle"></i> Matomo Analytics:</strong></p>
+      <p>This website uses Matomo (self-hosted analytics) to understand how visitors use our service. Matomo collects:</p>
+      <ul style="margin-left: 24px; margin-top: 8px;">
+        <li>IP addresses (anonymized)</li>
+        <li>Pages visited and time spent</li>
+        <li>Browser type and device information</li>
+        <li>Referring websites</li>
+      </ul>
+      <p>This data helps us improve the service. You can opt-out of tracking using browser extensions like "Do Not Track" or ad blockers.</p>
+    </div>
+
+    <h2><i class="fas fa-balance-scale"></i> 5. Legal Basis for Processing</h2>
+    <p>We process your personal data based on:</p>
+    <ul>
+      <li><strong>Consent:</strong> By using this service, you consent to the temporary processing of your data for resume generation</li>
+      <li><strong>Legitimate Interest:</strong> We have a legitimate interest in providing this service and improving it through analytics</li>
+    </ul>
+
+    <h2><i class="fas fa-user-shield"></i> 6. Your Rights (GDPR)</h2>
+    <p>Under GDPR, you have the right to:</p>
+    <ul>
+      <li><strong>Access:</strong> Request what data we have (in our case: none stored permanently)</li>
+      <li><strong>Rectification:</strong> Correct any inaccurate data (you control all data in your browser)</li>
+      <li><strong>Erasure:</strong> Request deletion (simply close the browser tab - no data persists)</li>
+      <li><strong>Data Portability:</strong> Export your data (use "Export JSON" button)</li>
+      <li><strong>Withdraw Consent:</strong> Stop using the service at any time</li>
+      <li><strong>Object to Processing:</strong> Do not use the service if you object to temporary server-side processing</li>
+    </ul>
+
+    <h2><i class="fas fa-lock"></i> 7. Data Security</h2>
+    <ul>
+      <li>All data transmission should occur over HTTPS (encrypted connections)</li>
+      <li>Server processing happens in isolated sessions with no cross-user data exposure</li>
+      <li>No data is logged to files or databases</li>
+      <li>Temporary files are immediately deleted after use</li>
+    </ul>
+
+    <h2><i class="fas fa-server"></i> 8. Data Controller</h2>
+    <p>The data controller for this service is the operator of this Resume Generator instance.</p>
+    <p>For privacy inquiries or to exercise your rights, please contact the service operator through the GitHub repository linked on the main page.</p>
+
+    <h2><i class="fas fa-globe"></i> 9. International Data Transfers</h2>
+    <p>Your data is processed on the server where this instance is hosted. No data is transferred to third parties or other countries, except:</p>
+    <ul>
+      <li>Matomo analytics data (stored on our self-hosted Matomo instance)</li>
+      <li>CDN resources (Font Awesome, Google Fonts) loaded by your browser</li>
+    </ul>
+
+    <h2><i class="fas fa-file-contract"></i> 10. Terms of Service</h2>
+    <ul>
+      <li>This service is provided "as-is" without warranties of any kind</li>
+      <li>You are responsible for the accuracy and legality of the content you enter</li>
+      <li>Do not use this service to process data of others without their consent</li>
+      <li>Do not attempt to abuse, hack, or overload the service</li>
+      <li>We reserve the right to refuse service or limit usage to ensure fair access</li>
+    </ul>
+
+    <h2><i class="fas fa-edit"></i> 11. Changes to This Policy</h2>
+    <p>We may update this privacy policy from time to time. The "Last updated" date at the top indicates when changes were last made. Continued use of the service after changes constitutes acceptance of the updated terms.</p>
+
+    <h2><i class="fas fa-envelope"></i> 12. Contact</h2>
+    <p>For questions about this privacy policy or data processing practices, please open an issue on our GitHub repository (linked on the main page).</p>
+
+    <a href="/" class="back-link">
+      <i class="fas fa-arrow-left"></i>
+      Back to Resume Generator
+    </a>
+  </div>
+</body>
+</html>
