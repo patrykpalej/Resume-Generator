@@ -58,13 +58,25 @@ function getStyles() {
       padding-bottom: 20px;
       margin-bottom: 30px;
       position: relative;
+    }
+
+    .header-top {
       display: flex;
-      align-items: center;
       gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .header-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .header-right {
+      flex-shrink: 0;
     }
 
     .profile-photo {
-      flex-shrink: 0;
       width: 180px;
       height: 180px;
       border-radius: 50%;
@@ -73,15 +85,10 @@ function getStyles() {
       box-shadow: none;
     }
 
-    .header-content {
-      flex: 1;
-      min-width: 0;
-    }
-
     h1 {
       font-size: 36px;
       color: #1a1a1a;
-      margin-bottom: 5px;
+      margin-bottom: 0;
       font-weight: 700;
       letter-spacing: 0.5px;
     }
@@ -89,8 +96,17 @@ function getStyles() {
     .title {
       font-size: 20px;
       color: #4a4a4a;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       font-weight: 400;
+      font-style: italic;
+    }
+
+    .summary {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #333;
+      margin-top: 0;
+      margin-bottom: 0;
       font-style: italic;
     }
 
@@ -101,6 +117,7 @@ function getStyles() {
       font-size: 14px;
       color: #333;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin-top: 20px;
     }
 
     .contact-info span {
@@ -129,15 +146,6 @@ function getStyles() {
       font-weight: 700;
       page-break-after: avoid;
       page-break-inside: avoid;
-    }
-
-    .summary {
-      font-size: 15px;
-      line-height: 1.8;
-      color: #333;
-      margin-top: 15px;
-      margin-bottom: 0;
-      font-style: italic;
     }
 
     .experience-item, .education-item, .project-item {
@@ -195,7 +203,6 @@ function getStyles() {
       display: flex;
       flex-wrap: nowrap;
       gap: 15px;
-      width: 95%;
     }
 
     .skill-category {
@@ -206,8 +213,8 @@ function getStyles() {
       border-top: 1px solid #e0e0e0;
       border-right: 1px solid #e0e0e0;
       border-bottom: 1px solid #e0e0e0;
-      flex-shrink: 0;
       min-width: 0;
+      box-sizing: border-box;
     }
 
     .skill-category h3 {

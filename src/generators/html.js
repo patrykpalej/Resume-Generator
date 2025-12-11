@@ -64,18 +64,14 @@ function generateSkillsSection(skills, sectionName = '💡 Skills') {
   // Limit to maximum 4 categories
   const limitedSkills = skills.slice(0, 4);
 
-  // Calculate total fraction sum
-  const totalFraction = limitedSkills.reduce((sum, category) => sum + (category.fraction || 1), 0);
-
   return `
   <section>
     <h2>${sectionName}</h2>
     <div class="skills-grid">
       ${limitedSkills.map(category => {
         const fraction = category.fraction || 1;
-        const percentage = (fraction / totalFraction * 100).toFixed(2);
         return `
-        <div class="skill-category" style="flex-basis: ${percentage}%; max-width: ${percentage}%;">
+        <div class="skill-category" style="flex: ${fraction} 1 0;">
           <h3>${category.name}</h3>
           <div class="skill-tags">
             ${category.items.map(item => `<span class="skill-tag">${item}</span>`).join('')}
@@ -199,20 +195,22 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
 <body>
   <div class="content-wrapper">
     <header>
-      <div class="header-content">
-        <h1>${personalInfo.name}</h1>
-        ${personalInfo.title ? `<div class="title">${personalInfo.title}</div>` : ''}
-        <div class="contact-info">
-          ${contactLinks.email ? `<span><i class="fas fa-envelope"></i><a href="mailto:${contactLinks.email}">${contactLinks.email}</a></span>` : ''}
-          ${contactLinks.phone ? `<span><i class="fas fa-phone"></i><a href="tel:${contactLinks.phone}">${contactLinks.phone}</a></span>` : ''}
-          ${contactLinks.linkedin ? `<span><i class="fab fa-linkedin"></i><a href="${contactLinks.linkedin}" target="_blank">${contactDisplay.linkedin}</a></span>` : ''}
-          ${contactLinks.github ? `<span><i class="fab fa-github"></i><a href="${contactLinks.github}" target="_blank">${contactDisplay.github}</a></span>` : ''}
-          ${contactLinks.website ? `<span><i class="fas fa-globe"></i><a href="${contactLinks.website}" target="_blank">${contactDisplay.website}</a></span>` : ''}
-          ${personalInfo.location ? `<span><i class="fas fa-map-marker-alt"></i>${personalInfo.location}</span>` : ''}
+      <div class="header-top">
+        <div class="header-left">
+          <h1>${personalInfo.name}</h1>
+          ${personalInfo.title ? `<div class="title">${personalInfo.title}</div>` : ''}
+          ${resumeData.summary ? `<p class="summary">${resumeData.summary}</p>` : ''}
         </div>
-        ${resumeData.summary ? `<p class="summary">${resumeData.summary}</p>` : ''}
+        ${photoBase64 ? `<div class="header-right"><img src="${photoBase64}" alt="${personalInfo.name}" class="profile-photo"></div>` : ''}
       </div>
-      ${photoBase64 ? `<img src="${photoBase64}" alt="${personalInfo.name}" class="profile-photo">` : ''}
+      <div class="contact-info">
+        ${contactLinks.email ? `<span><i class="fas fa-envelope"></i><a href="mailto:${contactLinks.email}">${contactLinks.email}</a></span>` : ''}
+        ${contactLinks.phone ? `<span><i class="fas fa-phone"></i><a href="tel:${contactLinks.phone}">${contactLinks.phone}</a></span>` : ''}
+        ${contactLinks.linkedin ? `<span><i class="fab fa-linkedin"></i><a href="${contactLinks.linkedin}" target="_blank">${contactDisplay.linkedin}</a></span>` : ''}
+        ${contactLinks.github ? `<span><i class="fab fa-github"></i><a href="${contactLinks.github}" target="_blank">${contactDisplay.github}</a></span>` : ''}
+        ${contactLinks.website ? `<span><i class="fas fa-globe"></i><a href="${contactLinks.website}" target="_blank">${contactDisplay.website}</a></span>` : ''}
+        ${personalInfo.location ? `<span><i class="fas fa-map-marker-alt"></i>${personalInfo.location}</span>` : ''}
+      </div>
     </header>
 
 ${sections}

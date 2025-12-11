@@ -68,16 +68,28 @@ function getStyles(palette) {
       padding-bottom: 20px;
       margin-bottom: 30px;
       position: relative;
-      display: flex;
-      align-items: center;
-      gap: 20px;
       background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
       padding: 15px;
       border-radius: 8px;
     }
 
-    .profile-photo {
+    .header-top {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .header-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .header-right {
       flex-shrink: 0;
+    }
+
+    .profile-photo {
       width: 180px;
       height: 180px;
       border-radius: 50%;
@@ -86,15 +98,10 @@ function getStyles(palette) {
       box-shadow: 0 8px 16px ${palette.primary}33;
     }
 
-    .header-content {
-      flex: 1;
-      min-width: 0;
-    }
-
     h1 {
       font-size: 36px;
       color: #1a1a1a;
-      margin-bottom: 5px;
+      margin-bottom: 0;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
@@ -102,8 +109,17 @@ function getStyles(palette) {
     .title {
       font-size: 20px;
       color: #666;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       font-weight: 400;
+    }
+
+    .summary {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #444;
+      margin-top: 0;
+      margin-bottom: 0;
+      font-style: italic;
     }
 
     .contact-info {
@@ -112,6 +128,7 @@ function getStyles(palette) {
       gap: 12px 20px;
       font-size: 14px;
       color: #444;
+      margin-top: 20px;
     }
 
     .contact-info span {
@@ -153,15 +170,6 @@ function getStyles(palette) {
       width: 4px;
       background: linear-gradient(to bottom, ${palette.primary}, ${palette.accent});
       border-radius: 2px;
-    }
-
-    .summary {
-      font-size: 15px;
-      line-height: 1.8;
-      color: #444;
-      margin-top: 15px;
-      margin-bottom: 0;
-      font-style: italic;
     }
 
     .experience-item, .education-item, .project-item {
@@ -223,7 +231,6 @@ function getStyles(palette) {
       display: flex;
       flex-wrap: nowrap;
       gap: 15px;
-      width: 95%;
     }
 
     .skill-category {
@@ -232,8 +239,8 @@ function getStyles(palette) {
       border-radius: 8px;
       border-left: 4px solid ${palette.primary};
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      flex-shrink: 0;
       min-width: 0;
+      box-sizing: border-box;
     }
 
     .skill-category h3 {
