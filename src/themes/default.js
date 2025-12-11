@@ -68,73 +68,77 @@ function getStyles(palette) {
       margin-bottom: 30px;
       position: relative;
       display: grid;
-      grid-template-columns: var(--header-col1-fraction, 1)fr var(--header-col2-fraction, 1)fr var(--header-col3-fraction, 1)fr;
+      grid-template-columns: 1fr auto;
       grid-template-rows: auto auto auto;
-      gap: 8px 20px;
+      gap: 12px 20px;
       align-items: start;
     }
 
-    header > h1 {
-      grid-column: 1 / 3;
+    .header-name {
+      grid-column: 1;
       grid-row: 1;
     }
 
-    header > .title {
-      grid-column: 1 / 3;
-      grid-row: 2;
+    .header-photo {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding-left: 20px;
     }
 
-    .header-column {
+    .header-summary {
+      grid-column: 1;
+      grid-row: 2;
       min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
       overflow-wrap: break-word;
       word-break: break-word;
     }
 
-    .header-col-info {
-      grid-column: 1;
-      grid-row: 3;
-    }
-
-    .header-col-contact {
-      grid-column: 2;
-      grid-row: 3;
-      align-self: end;
-    }
-
-    .header-col-photo {
+    .header-contacts {
       grid-column: 3;
       grid-row: 3;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
     }
 
-    .header-col-contact span {
+    .contact-grid {
+      display: grid;
+      grid-template-columns: var(--contact-grid-col1-fraction, 1)fr var(--contact-grid-col2-fraction, 1)fr var(--contact-grid-col3-fraction, 1)fr;
+      gap: 8px 12px;
+    }
+
+    .contact-item {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 14px;
       color: #555;
-      white-space: nowrap;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
-    .header-col-contact i {
+    .contact-item i {
       width: 16px;
+      flex-shrink: 0;
       color: ${palette.accent};
     }
 
-    .header-col-contact a {
+    .contact-item a {
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .contact-item a {
       color: #555;
     }
 
     .profile-photo {
       width: 180px;
       height: 180px;
-      max-width: 100%;
-      max-height: 100%;
+      max-width: 300px;
+      max-height: 300px;
       aspect-ratio: 1;
       border-radius: 50%;
       object-fit: cover;

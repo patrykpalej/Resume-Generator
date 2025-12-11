@@ -36,7 +36,7 @@ body {
 
 /* Sidebar Styles */
 .sidebar {
-  width: 540px;
+  width: 600px;
   background: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
   overflow-y: auto;

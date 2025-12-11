@@ -478,6 +478,21 @@ async function loadExampleData() {
     // Initialize all sections as enabled
     initializeEnabledSections(data);
 
+    // Load default photo
+    try {
+      const photoResponse = await fetch('/assets/photo-example.jpg');
+      const photoBlob = await photoResponse.blob();
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        state.photoBase64 = reader.result;
+        updatePhotoButtonState(true);
+        await autoGeneratePreview('photo');
+      };
+      reader.readAsDataURL(photoBlob);
+    } catch (photoError) {
+      console.error('Error loading default photo:', photoError);
+    }
+
     flashPreviewStatus('Example data loaded successfully', 'status-success');
 
     // Update section management UI

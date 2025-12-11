@@ -197,41 +197,57 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
     })
     .join('\n');
 
-  // Determine which header columns have content
-  const hasCol1 = true; // Always has name
-  const hasCol2 = !!(contactLinks.email || contactLinks.phone || contactLinks.linkedin ||
-                     contactLinks.github || contactLinks.website || personalInfo.location);
-  const hasCol3 = !!photoBase64;
+  // Determine which header sections have content
+  const hasContacts = !!(contactLinks.email || contactLinks.phone || contactLinks.linkedin ||
+                         contactLinks.github || contactLinks.website || personalInfo.location);
+  const hasPhoto = !!photoBase64;
 
-  // Calculate column fractions based on which columns exist
-  let col1Fraction, col2Fraction, col3Fraction;
-  const columnsPresent = [hasCol1, hasCol2, hasCol3].filter(Boolean).length;
+  // Create array of contact items with their display text
+  const contactItemsArray = [
+    contactLinks.email ? { text: contactLinks.email, length: contactLinks.email.length } : null,
+    contactLinks.phone ? { text: contactLinks.phone, length: contactLinks.phone.length } : null,
+    contactDisplay.linkedin ? { text: 'linkedin.com' + contactDisplay.linkedin, length: ('linkedin.com' + contactDisplay.linkedin).length } : null,
+    contactDisplay.github ? { text: 'github.com' + contactDisplay.github, length: ('github.com' + contactDisplay.github).length } : null,
+    contactDisplay.website ? { text: contactDisplay.website, length: contactDisplay.website.length } : null,
+    personalInfo.location ? { text: personalInfo.location, length: personalInfo.location.length } : null
+  ].filter(Boolean);
 
-  if (columnsPresent === 3) {
-    // All three columns: 0.35, 0.35, 0.3
-    col1Fraction = 0.35;
-    col2Fraction = 0.35;
-    col3Fraction = 0.3;
-  } else if (columnsPresent === 2) {
-    // Two columns: equal spacing (1:1)
-    if (hasCol1 && hasCol2) {
-      col1Fraction = 1;
-      col2Fraction = 1;
-      col3Fraction = 0;
-    } else if (hasCol1 && hasCol3) {
-      col1Fraction = 1;
-      col2Fraction = 0;
-      col3Fraction = 1;
+  // Calculate contact grid column widths based on actual content (3 columns)
+  // Items flow into 3 columns: indices 0,3,... go to column 1, indices 1,4,... go to column 2, indices 2,5,... go to column 3
+  let contactCol1Length = 0;
+  let contactCol2Length = 0;
+  let contactCol3Length = 0;
+  contactItemsArray.forEach((item, index) => {
+    const col = index % 3;
+    if (col === 0) {
+      contactCol1Length += item.length;
+    } else if (col === 1) {
+      contactCol2Length += item.length;
     } else {
-      col1Fraction = 0;
-      col2Fraction = 1;
-      col3Fraction = 1;
+      contactCol3Length += item.length;
     }
-  } else {
-    // Single column: takes full width
-    col1Fraction = hasCol1 ? 1 : 0;
-    col2Fraction = hasCol2 ? 1 : 0;
-    col3Fraction = hasCol3 ? 1 : 0;
+  });
+
+  // Calculate contact grid column fractions
+  let contactGridCol1Fraction = 1;
+  let contactGridCol2Fraction = 1;
+  let contactGridCol3Fraction = 1;
+  const totalContactLength = contactCol1Length + contactCol2Length + contactCol3Length;
+  if (totalContactLength > 0) {
+    contactGridCol1Fraction = contactCol1Length / totalContactLength;
+    contactGridCol2Fraction = contactCol2Length / totalContactLength;
+    contactGridCol3Fraction = contactCol3Length / totalContactLength;
+
+    // Ensure minimum column widths (at least 20% each for 3 columns)
+    if (contactGridCol1Fraction < 0.2) contactGridCol1Fraction = 0.2;
+    if (contactGridCol2Fraction < 0.2) contactGridCol2Fraction = 0.2;
+    if (contactGridCol3Fraction < 0.2) contactGridCol3Fraction = 0.2;
+
+    // Normalize
+    const contactNormalizedTotal = contactGridCol1Fraction + contactGridCol2Fraction + contactGridCol3Fraction;
+    contactGridCol1Fraction /= contactNormalizedTotal;
+    contactGridCol2Fraction /= contactNormalizedTotal;
+    contactGridCol3Fraction /= contactNormalizedTotal;
   }
 
   return `<!DOCTYPE html>
@@ -248,21 +264,25 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
 </head>
 <body>
   <div class="content-wrapper">
-    <header style="--header-col1-fraction: ${col1Fraction}; --header-col2-fraction: ${col2Fraction}; --header-col3-fraction: ${col3Fraction};">
-      <h1>${personalInfo.name}</h1>
-      ${personalInfo.title ? `<div class="title">${personalInfo.title}</div>` : ''}
-      ${resumeData.summary ? `<div class="header-column header-col-info">
-        <p class="summary">${resumeData.summary}</p>
-      </div>` : '<div class="header-column header-col-info"></div>'}
-      ${hasCol2 ? `<div class="header-column header-col-contact">
-        ${contactLinks.email ? `<span><i class="fas fa-envelope"></i><a href="mailto:${contactLinks.email}">${contactLinks.email}</a></span>` : ''}
-        ${contactLinks.phone ? `<span><i class="fas fa-phone"></i><a href="tel:${contactLinks.phone}">${contactLinks.phone}</a></span>` : ''}
-        ${contactLinks.linkedin ? `<span><i class="fab fa-linkedin"></i><a href="${contactLinks.linkedin}" target="_blank">${contactDisplay.linkedin}</a></span>` : ''}
-        ${contactLinks.github ? `<span><i class="fab fa-github"></i><a href="${contactLinks.github}" target="_blank">${contactDisplay.github}</a></span>` : ''}
-        ${contactLinks.website ? `<span><i class="fas fa-globe"></i><a href="${contactLinks.website}" target="_blank">${contactDisplay.website}</a></span>` : ''}
-        ${personalInfo.location ? `<span><i class="fas fa-map-marker-alt"></i>${personalInfo.location}</span>` : ''}
+    <header style="--contact-grid-col1-fraction: ${contactGridCol1Fraction}; --contact-grid-col2-fraction: ${contactGridCol2Fraction}; --contact-grid-col3-fraction: ${contactGridCol3Fraction};">
+      <div class="header-name">
+        <h1>${personalInfo.name}</h1>
+      </div>
+      ${hasPhoto ? `<div class="header-photo"><img src="${photoBase64}" alt="${personalInfo.name}" class="profile-photo"></div>` : ''}
+      <div class="header-summary">
+        ${personalInfo.title ? `<div class="title">${personalInfo.title}</div>` : ''}
+        ${resumeData.summary ? `<p class="summary">${resumeData.summary}</p>` : ''}
+      </div>
+      ${hasContacts ? `<div class="header-contacts">
+        <div class="contact-grid">
+          ${contactLinks.email ? `<span class="contact-item"><i class="fas fa-envelope"></i><a href="mailto:${contactLinks.email}">${contactLinks.email}</a></span>` : ''}
+          ${contactLinks.phone ? `<span class="contact-item"><i class="fas fa-phone"></i><a href="tel:${contactLinks.phone}">${contactLinks.phone}</a></span>` : ''}
+          ${contactLinks.linkedin ? `<span class="contact-item"><i class="fab fa-linkedin"></i><a href="${contactLinks.linkedin}" target="_blank">${contactDisplay.linkedin}</a></span>` : ''}
+          ${contactLinks.github ? `<span class="contact-item"><i class="fab fa-github"></i><a href="${contactLinks.github}" target="_blank">${contactDisplay.github}</a></span>` : ''}
+          ${contactLinks.website ? `<span class="contact-item"><i class="fas fa-globe"></i><a href="${contactLinks.website}" target="_blank">${contactDisplay.website}</a></span>` : ''}
+          ${personalInfo.location ? `<span class="contact-item"><i class="fas fa-map-marker-alt"></i>${personalInfo.location}</span>` : ''}
+        </div>
       </div>` : ''}
-      ${hasCol3 ? `<div class="header-column header-col-photo"><img src="${photoBase64}" alt="${personalInfo.name}" class="profile-photo"></div>` : ''}
     </header>
 
 ${sections}
