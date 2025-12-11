@@ -107,7 +107,8 @@ function getStyles(palette) {
 
     .contact-grid {
       display: grid;
-      grid-template-columns: var(--contact-grid-col1-fraction, 1)fr var(--contact-grid-col2-fraction, 1)fr var(--contact-grid-col3-fraction, 1)fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      width: 100%;
       gap: 8px 12px;
     }
 
