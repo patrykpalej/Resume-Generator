@@ -60,14 +60,18 @@
             </label>
           </div>
           <div class="photo-upload-wrapper">
-            <span class="button-label">Upload your photo (optional)</span>
-            <label for="photoInput" class="btn btn-secondary file-btn photo-upload-btn">
+            <span class="button-label" id="photoUploadLabel">Upload your photo (optional)</span>
+            <label for="photoInput" class="btn btn-secondary file-btn photo-upload-btn" id="photoUploadBtn">
               <span class="photo-label-main">
                 <i class="fas fa-portrait"></i>
                 Upload Photo
               </span>
               <input type="file" id="photoInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
             </label>
+            <button class="btn btn-danger photo-remove-btn" id="photoRemoveBtn" style="display: none;">
+              <i class="fas fa-trash-alt"></i>
+              Remove Photo
+            </button>
           </div>
         </div>
         <div id="dataStatus" class="status-message"></div>

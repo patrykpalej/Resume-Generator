@@ -52,7 +52,8 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-bottom: 4px;
+  padding-bottom: 0;
+  margin-bottom: 4px;
   flex-shrink: 0;
   flex-wrap: nowrap;
 }
@@ -81,6 +82,8 @@ body {
   font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
+  margin-top: -12px;
+  width: fit-content;
 }
 
 .badge-link {
@@ -353,6 +356,16 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
+}
+
+.photo-remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
   width: 100%;
 }
 
@@ -1378,12 +1391,12 @@ body {
 }
 
 .btn-danger {
-  background: #a44;
+  background: #c85a54;
   color: white;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #933;
+  background: #b34b45;
   box-shadow: 0 2px 4px var(--shadow);
 }
 

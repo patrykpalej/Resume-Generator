@@ -41,6 +41,9 @@ const elements = {
   closePdfPreviewBtn: document.getElementById('closePdfPreviewBtn'),
   fileInput: document.getElementById('fileInput'),
   photoInput: document.getElementById('photoInput'),
+  photoUploadBtn: document.getElementById('photoUploadBtn'),
+  photoRemoveBtn: document.getElementById('photoRemoveBtn'),
+  photoUploadLabel: document.getElementById('photoUploadLabel'),
   previewContainer: document.getElementById('previewContainer'),
   previewStatus: document.getElementById('previewStatus'),
   jsonEditorModal: document.getElementById('jsonEditorModal'),
@@ -249,6 +252,7 @@ function setupEventListeners() {
   elements.loadExampleBtn.addEventListener('click', loadExampleData);
   elements.fileInput.addEventListener('change', handleFileUpload);
   elements.photoInput.addEventListener('change', handlePhotoUpload);
+  elements.photoRemoveBtn.addEventListener('click', handlePhotoRemove);
   elements.themeSelect.addEventListener('change', handleThemeChange);
   elements.colorSelect.addEventListener('change', handleColorChange);
   elements.previewPdfBtn.addEventListener('click', showPdfPreview);
@@ -545,10 +549,44 @@ async function handlePhotoUpload(event) {
     state.photoBase64 = e.target.result;
     flashPreviewStatus(`Photo uploaded: ${file.name}`, 'status-success');
 
+    // Update UI to show remove button
+    updatePhotoButtonState(true);
+
     // Auto-generate preview
     await autoGeneratePreview('photo');
   };
   reader.readAsDataURL(file);
+}
+
+// Handle photo removal
+async function handlePhotoRemove() {
+  state.photoBase64 = null;
+
+  // Clear the file input
+  elements.photoInput.value = '';
+
+  // Update UI to show upload button
+  updatePhotoButtonState(false);
+
+  flashPreviewStatus('Photo removed', 'status-success');
+
+  // Auto-generate preview
+  await autoGeneratePreview('photo');
+}
+
+// Update photo button state (show upload or remove button)
+function updatePhotoButtonState(hasPhoto) {
+  if (hasPhoto) {
+    // Hide upload button and label, show remove button
+    elements.photoUploadBtn.style.display = 'none';
+    elements.photoUploadLabel.style.display = 'none';
+    elements.photoRemoveBtn.style.display = 'flex';
+  } else {
+    // Show upload button and label, hide remove button
+    elements.photoUploadBtn.style.display = 'flex';
+    elements.photoUploadLabel.style.display = 'block';
+    elements.photoRemoveBtn.style.display = 'none';
+  }
 }
 
 // Validate JSON - internal function
@@ -762,6 +800,9 @@ function applyMetaSettings(meta) {
 
   // Apply photo (or clear to null if not provided)
   state.photoBase64 = meta.photoBase64 || null;
+
+  // Update photo button state based on loaded photo
+  updatePhotoButtonState(!!state.photoBase64);
 
   // Apply custom section names if available
   if (meta.customSectionNames) {
