@@ -89,10 +89,12 @@ function generateSkillsSection(skills, sectionName = '💡 Skills') {
 
 function generateProjectsSection(projects, projectsIntro, sectionName = '🚀 Projects') {
   if (!projects || projects.length === 0) return '';
+  const introLink = projectsIntro?.link ? normalizeUrl(projectsIntro.link) : '';
+  const introLinkText = projectsIntro?.link ? stripProtocol(projectsIntro.linkText || projectsIntro.link) : '';
   return `
   <section>
     <h2>${sectionName}</h2>
-    ${projectsIntro ? `<p class="projects-intro">${projectsIntro.text} <a href="${projectsIntro.link}" target="_blank">${projectsIntro.linkText}</a></p>` : ''}
+    ${projectsIntro ? `<p class="projects-intro">${projectsIntro.text} <a href="${introLink}" target="_blank">${introLinkText}</a></p>` : ''}
     <div class="projects-grid">
       ${projects.map(project => `
         <div class="project-item">
@@ -102,7 +104,7 @@ function generateProjectsSection(projects, projectsIntro, sectionName = '🚀 Pr
             <div class="technologies">Technologies: ${project.technologies.join(', ')}</div>
           ` : ''}
           ${project.link ? `
-            <div class="project-link-line">Link: <a href="${normalizeUrl(project.link)}" target="_blank" rel="noopener noreferrer" class="project-link" title="View project">${project.link} <i class="fas fa-external-link-alt"></i></a></div>
+            <div class="project-link-line">Link: <a href="${normalizeUrl(project.link)}" target="_blank" rel="noopener noreferrer" class="project-link" title="View project">${stripProtocol(project.link || '')} <i class="fas fa-external-link-alt"></i></a></div>
           ` : ''}
         </div>
       `).join('')}
@@ -119,6 +121,11 @@ function normalizeUrl(url) {
   return `https://${url}`;
 }
 
+function stripProtocol(url) {
+  if (!url) return '';
+  return url.replace(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//, '');
+}
+
 function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, customSectionNames = {}) {
   if (!theme) {
     throw new Error('Theme is required to generate HTML.');
@@ -128,6 +135,20 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
   // Load theme styles
   const paletteToUse = theme.monochromatic ? undefined : colorPalette;
   const themeStyles = theme.getStyles(paletteToUse);
+
+  // Normalize external links to avoid double protocols
+  const contactLinks = {
+    email: personalInfo.email,
+    phone: personalInfo.phone,
+    linkedin: personalInfo.linkedin ? normalizeUrl(personalInfo.linkedin) : '',
+    github: personalInfo.github ? normalizeUrl(personalInfo.github) : '',
+    website: personalInfo.website ? normalizeUrl(personalInfo.website) : ''
+  };
+  const contactDisplay = {
+    linkedin: stripProtocol(contactLinks.linkedin),
+    github: stripProtocol(contactLinks.github),
+    website: stripProtocol(contactLinks.website)
+  };
 
   // Helper to get section display name
   const getSectionName = (sectionKey) => {
@@ -182,11 +203,12 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
         <h1>${personalInfo.name}</h1>
         ${personalInfo.title ? `<div class="title">${personalInfo.title}</div>` : ''}
         <div class="contact-info">
-          ${personalInfo.email ? `<span><i class="fas fa-envelope"></i><a href="mailto:${personalInfo.email}">${personalInfo.email}</a></span>` : ''}
-          ${personalInfo.phone ? `<span><i class="fas fa-phone"></i><a href="tel:${personalInfo.phone}">${personalInfo.phone}</a></span>` : ''}
-          ${personalInfo.website ? `<span><i class="fas fa-globe"></i><a href="https://${personalInfo.website}" target="_blank">${personalInfo.website}</a></span>` : ''}
-          ${personalInfo.linkedin ? `<span><i class="fab fa-linkedin"></i><a href="https://${personalInfo.linkedin}" target="_blank">${personalInfo.linkedin}</a></span>` : ''}
-          ${personalInfo.github ? `<span><i class="fab fa-github"></i><a href="https://${personalInfo.github}" target="_blank">${personalInfo.github}</a></span>` : ''}
+          ${contactLinks.email ? `<span><i class="fas fa-envelope"></i><a href="mailto:${contactLinks.email}">${contactLinks.email}</a></span>` : ''}
+          ${contactLinks.phone ? `<span><i class="fas fa-phone"></i><a href="tel:${contactLinks.phone}">${contactLinks.phone}</a></span>` : ''}
+          ${contactLinks.linkedin ? `<span><i class="fab fa-linkedin"></i><a href="${contactLinks.linkedin}" target="_blank">${contactDisplay.linkedin}</a></span>` : ''}
+          ${contactLinks.github ? `<span><i class="fab fa-github"></i><a href="${contactLinks.github}" target="_blank">${contactDisplay.github}</a></span>` : ''}
+          ${contactLinks.website ? `<span><i class="fas fa-globe"></i><a href="${contactLinks.website}" target="_blank">${contactDisplay.website}</a></span>` : ''}
+          ${personalInfo.location ? `<span><i class="fas fa-map-marker-alt"></i>${personalInfo.location}</span>` : ''}
         </div>
         ${resumeData.summary ? `<p class="summary">${resumeData.summary}</p>` : ''}
       </div>

@@ -140,6 +140,7 @@ const elements = {
   piWebsite: document.getElementById('piWebsite'),
   piLinkedin: document.getElementById('piLinkedin'),
   piGithub: document.getElementById('piGithub'),
+  piLocation: document.getElementById('piLocation'),
   // Summary Modal
   summaryModal: document.getElementById('summaryModal'),
   summaryTextarea: document.getElementById('summaryTextarea'),
@@ -3319,9 +3320,10 @@ function openPersonalInfoModal() {
   elements.piTitle.value = personalInfo.title || '';
   elements.piEmail.value = personalInfo.email || '';
   elements.piPhone.value = personalInfo.phone || '';
-  elements.piWebsite.value = personalInfo.website || '';
   elements.piLinkedin.value = personalInfo.linkedin || '';
   elements.piGithub.value = personalInfo.github || '';
+  elements.piWebsite.value = personalInfo.website || '';
+  elements.piLocation.value = personalInfo.location || '';
 
   // Hide any previous errors
   hidePersonalInfoFormError();
@@ -3374,14 +3376,17 @@ function savePersonalInfoForm() {
   const phone = elements.piPhone.value.trim();
   if (phone) personalInfo.phone = phone;
 
-  const website = elements.piWebsite.value.trim();
+  const website = normalizeUrlValue(elements.piWebsite.value.trim());
   if (website) personalInfo.website = website;
 
-  const linkedin = elements.piLinkedin.value.trim();
+  const linkedin = normalizeUrlValue(elements.piLinkedin.value.trim());
   if (linkedin) personalInfo.linkedin = linkedin;
 
-  const github = elements.piGithub.value.trim();
+  const github = normalizeUrlValue(elements.piGithub.value.trim());
   if (github) personalInfo.github = github;
+
+  const location = elements.piLocation.value.trim();
+  if (location) personalInfo.location = location;
 
   // Update state
   state.resumeData.personalInfo = personalInfo;
@@ -3403,6 +3408,15 @@ function savePersonalInfoForm() {
 // Simple email validation
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Ensure URLs have a protocol so links remain valid
+function normalizeUrlValue(url) {
+  if (!url) return '';
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(url)) {
+    return url;
+  }
+  return `https://${url}`;
 }
 
 // GDPR Clause Modal Functions

@@ -112,7 +112,7 @@ function getStyles(palette) {
 
     .contact-info {
       display: grid;
-      grid-template-columns: repeat(3, auto);
+      grid-template-columns: repeat(2, auto);
       gap: 12px 20px;
       font-size: 14px;
       color: #333;

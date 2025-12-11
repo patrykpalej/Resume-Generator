@@ -4,9 +4,10 @@
     "title": "Your Role",
     "email": "your@email.com",
     "phone": "+48 123 456 789",
-    "website": "yourwebsite.com",
-    "linkedin": "linkedin.com/in/your-linkedin",
-    "github": "github.com/your-github"
+    "website": "https://yourwebsite.com",
+    "linkedin": "https://linkedin.com/in/your-linkedin",
+    "github": "https://github.com/your-github",
+    "location": "Your City / Country"
   },
   "summary": "Full-stack engineer who enjoys shipping reliable web applications and collaborating across teams.",
   "skills": [
