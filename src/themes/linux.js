@@ -98,6 +98,10 @@ function getStyles(palette) {
       grid-row: 3;
     }
 
+    header.no-summary .header-contacts {
+      grid-row: 2;
+    }
+
     .contact-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));

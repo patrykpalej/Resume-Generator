@@ -14,6 +14,10 @@ const PORT = 8003;
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/gallery', express.static(path.join(__dirname, 'public', 'gallery')));
+app.get('/gallery', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'gallery', 'index.html'));
+});
 
 // API endpoint to get all available themes
 app.get('/api/themes', (req, res) => {

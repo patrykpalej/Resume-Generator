@@ -83,7 +83,7 @@ function generateSkillsSection(skills, sectionName = '💡 Skills') {
   </section>`;
 }
 
-function generateProjectsSection(projects, projectsIntro, sectionName = '🚀 Projects') {
+function generateProjectsSection(projects, projectsIntro, sectionName = '🚀 Side Projects') {
   if (!projects || projects.length === 0) return '';
   const introLink = projectsIntro?.link ? normalizeUrl(projectsIntro.link) : '';
   const introLinkText = projectsIntro?.link ? stripProtocol(projectsIntro.linkText || projectsIntro.link) : '';
@@ -172,7 +172,7 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
       experience: '💼 Experience',
       education: '🎓 Education',
       skills: '💡 Skills',
-      projects: '🚀 Projects'
+      projects: '🚀 Side Projects'
     };
     return defaultNames[sectionKey] || sectionKey;
   };
@@ -256,15 +256,15 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
 </head>
 <body>
   <div class="content-wrapper">
-    <header style="--contact-grid-col1-fraction: ${contactGridCol1Fraction}; --contact-grid-col2-fraction: ${contactGridCol2Fraction};">
+    <header class="${resumeData.summary ? 'has-summary' : 'no-summary'}" style="--contact-grid-col1-fraction: ${contactGridCol1Fraction}; --contact-grid-col2-fraction: ${contactGridCol2Fraction};">
       <div class="header-name">
         <h1>${personalInfo.name}</h1>
+        ${personalInfo.title ? `<div class="title">${personalInfo.title}</div>` : ''}
       </div>
       ${hasPhoto ? `<div class="header-photo"><img src="${photoBase64}" alt="${personalInfo.name}" class="profile-photo"></div>` : ''}
-      <div class="header-summary">
-        ${personalInfo.title ? `<div class="title">${personalInfo.title}</div>` : ''}
-        ${resumeData.summary ? `<p class="summary">${resumeData.summary}</p>` : ''}
-      </div>
+      ${resumeData.summary ? `<div class="header-summary">
+        <p class="summary">${resumeData.summary}</p>
+      </div>` : ''}
       ${hasContacts ? `<div class="header-contacts">
         <div class="contact-grid">
           ${contactLinks.email ? `<span class="contact-item"><i class="fas fa-envelope"></i><a href="mailto:${contactLinks.email}">${contactLinks.email}</a></span>` : ''}

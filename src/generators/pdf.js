@@ -2,8 +2,14 @@ const puppeteer = require('puppeteer');
 
 async function generatePDF(htmlContent, outputPath) {
   const browser = await puppeteer.launch({
-    headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-web-security', // Allow loading fonts from CDN
+      '--font-render-hinting=none'
+    ]
   });
 
   try {
@@ -17,10 +23,49 @@ async function generatePDF(htmlContent, outputPath) {
       deviceScaleFactor: 2 // Higher resolution for better text rendering
     });
 
+    // Set content and wait for network to be idle
     await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-    // Wait for fonts to load completely
+    // Wait for all fonts to load (Font Awesome icons)
     await page.evaluateHandle('document.fonts.ready');
+
+    // Add CSS for emoji images (Twemoji) to ensure proper sizing
+    await page.addStyleTag({
+      content: `
+        img.emoji {
+          height: 1em;
+          width: 1em;
+          margin: 0 0.05em 0 0.1em;
+          vertical-align: -0.1em;
+          display: inline-block;
+        }
+      `
+    });
+
+    // Convert emojis to SVG using Twemoji for reliable PDF rendering
+    try {
+      await page.addScriptTag({
+        url: 'https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js'
+      });
+
+      await page.evaluate(() => {
+        // Parse emojis and convert to SVG images
+        if (window.twemoji) {
+          twemoji.parse(document.body, {
+            folder: 'svg',
+            ext: '.svg',
+            base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/',
+            className: 'emoji'
+          });
+        }
+      });
+
+      // Wait for emoji SVG images to load
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    } catch (err) {
+      console.warn('Twemoji loading failed, emojis may not render correctly:', err.message);
+      // Continue anyway - Font Awesome should still work
+    }
 
     // Position GDPR at absolute bottom of page 2
     await page.evaluate(() => {

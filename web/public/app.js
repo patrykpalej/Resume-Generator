@@ -1489,7 +1489,7 @@ function getSectionDisplayName(section) {
     skills: 'Skills & Languages',
     experience: 'Experience',
     education: 'Education',
-    projects: 'Hobby Projects',
+    projects: 'Side Projects',
     gdprClause: 'GDPR Clause'
   };
   return names[section] || section;
@@ -1507,7 +1507,7 @@ function getCVHeaderName(section) {
     skills: '💡 Skills',
     experience: '💼 Experience',
     education: '🎓 Education',
-    projects: '🚀 Projects'
+    projects: '🚀 Side Projects'
   };
   return cvHeaders[section] || section;
 }
@@ -1815,7 +1815,7 @@ function getDefaultSectionName(section) {
     skills: 'Skills & Languages',
     experience: 'Experience',
     education: 'Education',
-    projects: 'Hobby Projects',
+    projects: 'Side Projects',
     gdprClause: 'GDPR Clause'
   };
   return names[section] || section;
@@ -1827,7 +1827,7 @@ function getDefaultCVHeaderName(section) {
     skills: '💡 Skills',
     experience: '💼 Experience',
     education: '🎓 Education',
-    projects: '🚀 Projects'
+    projects: '🚀 Side Projects'
   };
   return cvHeaders[section] || section;
 }
