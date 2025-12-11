@@ -3352,6 +3352,40 @@ function saveEducationForm() {
   autoGeneratePreview('section-edit');
 }
 
+// Helper function to extract slug from LinkedIn URL
+function extractLinkedinSlug(url) {
+  if (!url) return '';
+  // Remove protocol
+  const cleaned = url.replace(/^https?:\/\//, '').replace(/^www\./, '');
+  // Extract slug after linkedin.com/in/ or linkedin.com/company/
+  const match = cleaned.match(/linkedin\.com\/(in|company)\/([^\/\?]+)/);
+  if (match) {
+    return match[2]; // Return just the username/company name
+  }
+  // If it's already just a slug, return it
+  if (!cleaned.includes('/') && !cleaned.includes('.')) {
+    return cleaned;
+  }
+  return url;
+}
+
+// Helper function to extract slug from GitHub URL
+function extractGithubSlug(url) {
+  if (!url) return '';
+  // Remove protocol
+  const cleaned = url.replace(/^https?:\/\//, '').replace(/^www\./, '');
+  // Extract slug after github.com/
+  const match = cleaned.match(/github\.com\/([^\/\?]+)/);
+  if (match) {
+    return match[1]; // Return just the username
+  }
+  // If it's already just a slug, return it
+  if (!cleaned.includes('/') && !cleaned.includes('.')) {
+    return cleaned;
+  }
+  return url;
+}
+
 // Personal Info Modal Functions
 function openPersonalInfoModal() {
   // Populate form with current data
@@ -3361,8 +3395,8 @@ function openPersonalInfoModal() {
   elements.piTitle.value = personalInfo.title || '';
   elements.piEmail.value = personalInfo.email || '';
   elements.piPhone.value = personalInfo.phone || '';
-  elements.piLinkedin.value = personalInfo.linkedin || '';
-  elements.piGithub.value = personalInfo.github || '';
+  elements.piLinkedin.value = extractLinkedinSlug(personalInfo.linkedin) || '';
+  elements.piGithub.value = extractGithubSlug(personalInfo.github) || '';
   elements.piWebsite.value = personalInfo.website || '';
   elements.piLocation.value = personalInfo.location || '';
 
@@ -3420,11 +3454,23 @@ function savePersonalInfoForm() {
   const website = normalizeUrlValue(elements.piWebsite.value.trim());
   if (website) personalInfo.website = website;
 
-  const linkedin = normalizeUrlValue(elements.piLinkedin.value.trim());
-  if (linkedin) personalInfo.linkedin = linkedin;
+  const linkedinSlug = elements.piLinkedin.value.trim();
+  if (linkedinSlug) {
+    // Prepend linkedin.com/in/ if user only entered slug
+    const linkedin = linkedinSlug.includes('://') || linkedinSlug.startsWith('linkedin.com')
+      ? normalizeUrlValue(linkedinSlug)
+      : normalizeUrlValue(`linkedin.com/in/${linkedinSlug}`);
+    personalInfo.linkedin = linkedin;
+  }
 
-  const github = normalizeUrlValue(elements.piGithub.value.trim());
-  if (github) personalInfo.github = github;
+  const githubSlug = elements.piGithub.value.trim();
+  if (githubSlug) {
+    // Prepend github.com/ if user only entered slug
+    const github = githubSlug.includes('://') || githubSlug.startsWith('github.com')
+      ? normalizeUrlValue(githubSlug)
+      : normalizeUrlValue(`github.com/${githubSlug}`);
+    personalInfo.github = github;
+  }
 
   const location = elements.piLocation.value.trim();
   if (location) personalInfo.location = location;

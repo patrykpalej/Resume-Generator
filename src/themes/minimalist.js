@@ -60,27 +60,75 @@ function getStyles() {
       padding-bottom: 20px;
       margin-bottom: 30px;
       position: relative;
+      display: grid;
+      grid-template-columns: var(--header-col1-fraction, 1)fr var(--header-col2-fraction, 1)fr var(--header-col3-fraction, 1)fr;
+      grid-template-rows: auto auto auto;
+      gap: 8px 20px;
+      align-items: start;
     }
 
-    .header-top {
-      display: flex;
-      gap: 20px;
-      align-items: flex-start;
-      margin-bottom: 20px;
+    header > h1 {
+      grid-column: 1 / 3;
+      grid-row: 1;
     }
 
-    .header-left {
-      flex: 1;
+    header > .title {
+      grid-column: 1 / 3;
+      grid-row: 2;
+    }
+
+    .header-column {
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
-    .header-right {
-      flex-shrink: 0;
+    .header-col-info {
+      grid-column: 1;
+      grid-row: 3;
+    }
+
+    .header-col-contact {
+      grid-column: 2;
+      grid-row: 3;
+      align-self: end;
+    }
+
+    .header-col-photo {
+      grid-column: 3;
+      grid-row: 3;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .header-col-contact span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #333;
+      white-space: nowrap;
+    }
+
+    .header-col-contact i {
+      width: 16px;
+      color: #000;
+    }
+
+    .header-col-contact a {
+      color: #333;
     }
 
     .profile-photo {
       width: 180px;
       height: 180px;
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 1;
       border-radius: 50%;
       object-fit: cover;
       border: 1px solid #000;
@@ -99,7 +147,7 @@ function getStyles() {
     .title {
       font-size: 20px;
       color: #666;
-      margin-bottom: 12px;
+      margin-bottom: 0;
       font-weight: 400;
       letter-spacing: 1px;
       text-transform: uppercase;
@@ -113,27 +161,6 @@ function getStyles() {
       margin-bottom: 0;
       font-style: normal;
       font-weight: 300;
-    }
-
-    .contact-info {
-      display: grid;
-      grid-template-columns: repeat(2, auto);
-      gap: 12px 20px;
-      font-size: 14px;
-      color: #333;
-      margin-top: 20px;
-    }
-
-    .contact-info span {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-
-    .contact-info i {
-      width: 16px;
-      color: #000;
     }
 
     section {

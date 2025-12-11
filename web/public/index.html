@@ -105,6 +105,9 @@
             </select>
           </div>
         </div>
+        <div class="contribute-link">
+          Don't like existing themes? <a href="https://github.com/patrykpalej/Resume-Generator" target="_blank" rel="noopener noreferrer">Contribute!</a>
+        </div>
       </div>
 
       <div class="control-section">
@@ -515,11 +518,17 @@
           <div class="form-row">
             <div class="form-field">
               <label for="piLinkedin">LinkedIn (you can leave it blank)</label>
-              <input type="text" id="piLinkedin">
+              <div class="input-group">
+                <span class="input-group-prepend">linkedin.com/in/</span>
+                <input type="text" id="piLinkedin" placeholder="your-profile">
+              </div>
             </div>
             <div class="form-field">
               <label for="piGithub">GitHub (you can leave it blank)</label>
-              <input type="text" id="piGithub">
+              <div class="input-group">
+                <span class="input-group-prepend">github.com/</span>
+                <input type="text" id="piGithub" placeholder="username">
+              </div>
             </div>
           </div>
 
