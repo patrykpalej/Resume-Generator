@@ -2292,10 +2292,6 @@ function updateSkillsLimitUI(count) {
     elements.addSkillBtn.disabled = atLimit;
     elements.addSkillBtn.title = atLimit ? 'You can keep up to 4 skill groups' : '';
   }
-
-  if (elements.skillsLimitPill) {
-    elements.skillsLimitPill.style.display = atLimit ? 'inline-flex' : 'none';
-  }
 }
 
 function populateSkillsList() {

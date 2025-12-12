@@ -1763,35 +1763,24 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  height: 650px;
+  height: 470px;
 }
 
-.skills-hint-row {
+.skills-header-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
-  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+#addSkillBtn {
+  width: auto;
+  min-width: 0;
+  height: 34px;
+  min-height: 34px;
+  padding: 6px 12px;
   font-size: 13px;
-}
-
-.skills-hint {
-  line-height: 1.4;
-}
-
-.skills-limit-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(91, 124, 153, 0.12);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  margin: 0;
 }
 
 .skills-list {
@@ -1799,11 +1788,11 @@ body {
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 8px;
-  flex: 0 0 auto;
-  overflow: visible;
-  padding: 2px 0 6px;
+  flex: 1 1 auto;
+  overflow: hidden;
+  padding: 2px 0 2px;
   width: 100%;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .skill-list-item-row {
@@ -1812,7 +1801,7 @@ body {
   gap: 0;
   flex: 1 1 0;
   min-width: 0;
-  height: 300px;
+  height: auto;
 }
 
 .skill-list-item-row.dragging {
@@ -1827,14 +1816,14 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px 10px;
+  gap: 6px;
+  padding: 10px 12px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   transition: all 0.2s;
   height: 100%;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .skill-list-item .experience-list-item-controls {
@@ -1918,11 +1907,12 @@ body {
 }
 
 #addSkillBtn {
-  width: 16%;
-  height: 50px;
+  width: 22%;
+  min-width: 180px;
+  height: 46px;
   min-height: 44px;
   align-self: center;
-  margin-top: 30px;
+  margin: 6px 0 8px;
 }
 
 #skillsModal .modal-footer {
@@ -1938,6 +1928,27 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   flex-shrink: 0;
+  margin: 12px 0 0;
+  width: 65%;
+  max-width: 65%;
+}
+
+.skills-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+#addSkillBtn {
+  width: auto;
+  min-width: 0;
+  height: 34px;
+  min-height: 34px;
+  padding: 6px 12px;
+  font-size: 13px;
+  margin: 0 0 0 auto;
+  align-self: flex-start;
 }
 
 .skills-weights-panel-title {
