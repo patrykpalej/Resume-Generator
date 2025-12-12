@@ -256,6 +256,30 @@ body {
   text-align: center;
 }
 
+.tooltip-selfhost {
+  margin-top: 8px !important;
+  padding: 8px 10px;
+  background: #e3f2fd;
+  border: 1px solid #2196f3;
+  border-radius: 4px;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #0d47a1 !important;
+  text-align: center;
+}
+
+.tooltip-selfhost a {
+  color: #1565c0 !important;
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.tooltip-selfhost a:hover {
+  color: #0d47a1 !important;
+  text-decoration: underline;
+}
+
 .badge-link {
   background: #e8f1fb;
   color: #245fae;
