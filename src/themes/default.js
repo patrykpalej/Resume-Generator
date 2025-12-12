@@ -16,6 +16,71 @@ function getStyles(palette) {
       box-sizing: border-box;
     }
 
+    /* User content isolation - prevents injected HTML/CSS from breaking layout */
+    .user-content-isolated {
+      /* Force inline display to prevent layout disruption */
+      display: inline !important;
+      /* Prevent layout-breaking properties */
+      float: none !important;
+      clear: none !important;
+      /* Prevent positioning from breaking flow */
+      position: static !important;
+      top: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      left: auto !important;
+      z-index: auto !important;
+      /* Prevent transforms from breaking layout */
+      transform: none !important;
+      /* Prevent overflow issues */
+      overflow: visible !important;
+      /* Maintain inline behavior - no box model changes */
+      width: auto !important;
+      height: auto !important;
+      max-width: none !important;
+      max-height: none !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      /* Prevent margin/padding from breaking layout */
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      /* Prevent flex/grid from breaking parent layout */
+      flex: none !important;
+      flex-grow: 0 !important;
+      flex-shrink: 1 !important;
+      flex-basis: auto !important;
+      grid-column: auto !important;
+      grid-row: auto !important;
+      align-self: auto !important;
+      justify-self: auto !important;
+      /* Allow user content to inherit text styles from parent */
+      font-family: inherit !important;
+      font-size: inherit !important;
+      color: inherit !important;
+      line-height: inherit !important;
+      font-weight: inherit !important;
+      text-align: inherit !important;
+      vertical-align: baseline !important;
+    }
+
+    /* Ensure all child elements inside isolated content also stay inline */
+    .user-content-isolated * {
+      display: inline !important;
+      position: static !important;
+      float: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      transform: none !important;
+      width: auto !important;
+      height: auto !important;
+      max-width: none !important;
+      max-height: none !important;
+      flex: none !important;
+      grid-column: auto !important;
+      grid-row: auto !important;
+    }
+
     a {
       color: inherit;
       text-decoration: none;
@@ -145,15 +210,19 @@ function getStyles(palette) {
     }
 
     .profile-photo {
-      width: 180px;
-      height: 180px;
-      max-width: 300px;
-      max-height: 300px;
-      aspect-ratio: 1;
+      width: 180px !important;
+      height: 180px !important;
+      max-width: 180px !important;
+      max-height: 180px !important;
+      min-width: 180px !important;
+      min-height: 180px !important;
+      aspect-ratio: 1 !important;
       border-radius: 50%;
       object-fit: cover;
       border: 4px solid ${palette.primary};
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      flex-shrink: 0 !important;
+      flex-grow: 0 !important;
     }
 
     h1 {
@@ -369,6 +438,12 @@ function getStyles(palette) {
       }
 
       .profile-photo {
+        width: 180px !important;
+        height: 180px !important;
+        max-width: 180px !important;
+        max-height: 180px !important;
+        min-width: 180px !important;
+        min-height: 180px !important;
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
       }

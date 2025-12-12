@@ -14,6 +14,7 @@ const PORT = 8003;
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use('/gallery', express.static(path.join(__dirname, 'public', 'gallery')));
 app.get('/gallery', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'gallery', 'index.html'));

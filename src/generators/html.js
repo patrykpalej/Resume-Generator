@@ -1,3 +1,14 @@
+/**
+ * Wraps user-provided content in an isolation container to prevent
+ * injected HTML/CSS from affecting the rest of the document structure.
+ * This allows users to use custom HTML with styles, gradients, etc.
+ * without breaking the layout.
+ */
+function isolateUserContent(content) {
+  if (content === undefined || content === null) return '';
+  return `<span class="user-content-isolated">${content}</span>`;
+}
+
 function formatDate(dateStr) {
   if (!dateStr) return 'Present';
   const date = new Date(dateStr);
@@ -10,13 +21,13 @@ function generateExperienceSection(experience, sectionName = '💼 Experience') 
   if (!experience || experience.length === 0) return '';
   return `
   <section>
-    <h2>${sectionName}</h2>
+    <h2>${isolateUserContent(sectionName)}</h2>
     ${experience.map(exp => `
       <div class="experience-item">
         <div class="experience-header">
           <div>
-            <div class="position">${exp.position}</div>
-            <div class="company">${exp.company}</div>
+            <div class="position">${isolateUserContent(exp.position)}</div>
+            <div class="company">${isolateUserContent(exp.company)}</div>
           </div>
           <div class="date-location">
             ${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}
@@ -24,7 +35,7 @@ function generateExperienceSection(experience, sectionName = '💼 Experience') 
         </div>
         ${exp.responsibilities && exp.responsibilities.length > 0 ? `
           <ul>
-            ${exp.responsibilities.map(resp => `<li>${resp}</li>`).join('')}
+            ${exp.responsibilities.map(resp => `<li>${isolateUserContent(resp)}</li>`).join('')}
           </ul>
         ` : ''}
       </div>
@@ -36,7 +47,7 @@ function generateEducationSection(education, sectionName = '🎓 Education') {
   if (!education || education.length === 0) return '';
   return `
   <section>
-    <h2>${sectionName}</h2>
+    <h2>${isolateUserContent(sectionName)}</h2>
     ${education.map(edu => {
       // Format date range: show "startDate - graduationDate" if startDate exists, otherwise just graduationDate
       const dateDisplay = edu.startDate
@@ -47,8 +58,8 @@ function generateEducationSection(education, sectionName = '🎓 Education') {
       <div class="education-item">
         <div class="education-header">
           <div>
-            <div class="degree">${edu.degree}${edu.level ? ` <span class="education-level">(${edu.level})</span>` : ''}</div>
-            <div class="institution">${edu.institution}</div>
+            <div class="degree">${isolateUserContent(edu.degree)}${edu.level ? ` <span class="education-level">(${isolateUserContent(edu.level)})</span>` : ''}</div>
+            <div class="institution">${isolateUserContent(edu.institution)}</div>
           </div>
           <div class="date-location">${dateDisplay}</div>
         </div>
@@ -66,15 +77,15 @@ function generateSkillsSection(skills, sectionName = '💡 Skills') {
 
   return `
   <section>
-    <h2>${sectionName}</h2>
+    <h2>${isolateUserContent(sectionName)}</h2>
     <div class="skills-grid">
       ${limitedSkills.map(category => {
         const fraction = category.fraction || 1;
         return `
         <div class="skill-category" style="flex: ${fraction} 1 0;">
-          <h3>${category.name}</h3>
+          <h3>${isolateUserContent(category.name)}</h3>
           <div class="skill-tags">
-            ${category.items.map(item => `<span class="skill-tag">${item}</span>`).join('')}
+            ${category.items.map(item => `<span class="skill-tag">${isolateUserContent(item)}</span>`).join('')}
           </div>
         </div>
         `;
@@ -89,18 +100,18 @@ function generateProjectsSection(projects, projectsIntro, sectionName = '🚀 Si
   const introLinkText = projectsIntro?.link ? stripProtocol(projectsIntro.linkText || projectsIntro.link) : '';
   return `
   <section>
-    <h2>${sectionName}</h2>
-    ${projectsIntro ? `<p class="projects-intro">${projectsIntro.text} <a href="${introLink}" target="_blank">${introLinkText}</a></p>` : ''}
+    <h2>${isolateUserContent(sectionName)}</h2>
+    ${projectsIntro ? `<p class="projects-intro">${isolateUserContent(projectsIntro.text)} <a href="${introLink}" target="_blank">${isolateUserContent(introLinkText)}</a></p>` : ''}
     <div class="projects-grid">
       ${projects.map(project => `
         <div class="project-item">
-          <div class="project-name">${project.name}</div>
-          <p class="project-description">${project.description}</p>
+          <div class="project-name">${isolateUserContent(project.name)}</div>
+          <p class="project-description">${isolateUserContent(project.description)}</p>
           ${project.technologies && project.technologies.length > 0 ? `
-            <div class="technologies">Technologies: ${project.technologies.join(', ')}</div>
+            <div class="technologies">Technologies: ${isolateUserContent(project.technologies.join(', '))}</div>
           ` : ''}
           ${project.link ? `
-            <div class="project-link-line">Link: <a href="${normalizeUrl(project.link)}" target="_blank" rel="noopener noreferrer" class="project-link" title="View project">${stripProtocol(project.link || '')} <i class="fas fa-external-link-alt"></i></a></div>
+            <div class="project-link-line">Link: <a href="${normalizeUrl(project.link)}" target="_blank" rel="noopener noreferrer" class="project-link" title="View project">${isolateUserContent(stripProtocol(project.link || ''))} <i class="fas fa-external-link-alt"></i></a></div>
           ` : ''}
         </div>
       `).join('')}
@@ -258,21 +269,21 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
   <div class="content-wrapper">
     <header class="${resumeData.summary ? 'has-summary' : 'no-summary'}" style="--contact-grid-col1-fraction: ${contactGridCol1Fraction}; --contact-grid-col2-fraction: ${contactGridCol2Fraction};">
       <div class="header-name">
-        <h1>${personalInfo.name}</h1>
-        ${personalInfo.title ? `<div class="title">${personalInfo.title}</div>` : ''}
+        <h1>${isolateUserContent(personalInfo.name)}</h1>
+        ${personalInfo.title ? `<div class="title">${isolateUserContent(personalInfo.title)}</div>` : ''}
       </div>
-      ${hasPhoto ? `<div class="header-photo"><img src="${photoBase64}" alt="${personalInfo.name}" class="profile-photo"></div>` : ''}
+      ${hasPhoto ? `<div class="header-photo"><img src="${photoBase64}" alt="photo-image" class="profile-photo"></div>` : ''}
       ${resumeData.summary ? `<div class="header-summary">
-        <p class="summary">${resumeData.summary}</p>
+        <p class="summary">${isolateUserContent(resumeData.summary)}</p>
       </div>` : ''}
       ${hasContacts ? `<div class="header-contacts">
         <div class="contact-grid">
-          ${contactLinks.email ? `<span class="contact-item"><i class="fas fa-envelope"></i><a href="mailto:${contactLinks.email}">${contactLinks.email}</a></span>` : ''}
-          ${contactLinks.phone ? `<span class="contact-item"><i class="fas fa-phone"></i><a href="tel:${contactLinks.phone}">${contactLinks.phone}</a></span>` : ''}
-          ${contactLinks.linkedin ? `<span class="contact-item"><i class="fab fa-linkedin"></i><a href="${contactLinks.linkedin}" target="_blank">${contactDisplay.linkedin}</a></span>` : ''}
-          ${contactLinks.github ? `<span class="contact-item"><i class="fab fa-github"></i><a href="${contactLinks.github}" target="_blank">${contactDisplay.github}</a></span>` : ''}
-          ${contactLinks.website ? `<span class="contact-item"><i class="fas fa-globe"></i><a href="${contactLinks.website}" target="_blank">${contactDisplay.website}</a></span>` : ''}
-          ${personalInfo.location ? `<span class="contact-item"><i class="fas fa-map-marker-alt"></i>${personalInfo.location}</span>` : ''}
+          ${contactLinks.email ? `<span class="contact-item"><i class="fas fa-envelope"></i><a href="mailto:${contactLinks.email}">${isolateUserContent(contactLinks.email)}</a></span>` : ''}
+          ${contactLinks.phone ? `<span class="contact-item"><i class="fas fa-phone"></i><a href="tel:${contactLinks.phone}">${isolateUserContent(contactLinks.phone)}</a></span>` : ''}
+          ${contactLinks.linkedin ? `<span class="contact-item"><i class="fab fa-linkedin"></i><a href="${contactLinks.linkedin}" target="_blank">${isolateUserContent(contactDisplay.linkedin)}</a></span>` : ''}
+          ${contactLinks.github ? `<span class="contact-item"><i class="fab fa-github"></i><a href="${contactLinks.github}" target="_blank">${isolateUserContent(contactDisplay.github)}</a></span>` : ''}
+          ${contactLinks.website ? `<span class="contact-item"><i class="fas fa-globe"></i><a href="${contactLinks.website}" target="_blank">${isolateUserContent(contactDisplay.website)}</a></span>` : ''}
+          ${personalInfo.location ? `<span class="contact-item"><i class="fas fa-map-marker-alt"></i>${isolateUserContent(personalInfo.location)}</span>` : ''}
         </div>
       </div>` : ''}
     </header>
@@ -281,7 +292,7 @@ ${sections}
   </div>
 
 ${resumeData.gdprClause || showWatermark ? `<div class="gdpr-watermark-wrapper">
-${resumeData.gdprClause ? `<div class="gdpr-clause">${resumeData.gdprClause}</div>` : ''}
+${resumeData.gdprClause ? `<div class="gdpr-clause">${isolateUserContent(resumeData.gdprClause)}</div>` : ''}
 ${showWatermark ? '<div class="watermark">Designed with <a href="https://cre8ive.cv" target="_blank" rel="noopener noreferrer">cre8ive.cv</a></div>' : ''}
 </div>` : ''}
 </body>

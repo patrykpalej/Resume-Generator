@@ -636,7 +636,7 @@ body {
 .watermark-checkbox-inline {
   flex: 0 1 auto;
   margin: 0;
-  max-width: 240px;
+  max-width: 220px;
 }
 
 .watermark-checkbox-inline .checkbox-label {

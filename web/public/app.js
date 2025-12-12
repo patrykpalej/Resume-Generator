@@ -280,6 +280,10 @@ async function init() {
     setPreviewStatus('Restoring previous session...', 'status-info');
     await autoGeneratePreview('restore');
     flashPreviewStatus('Previous session restored from browser storage', 'status-success');
+  } else {
+    // Automatically load the starter template on first visit
+    setPreviewStatus('Loading starter template...', 'status-info');
+    await loadExampleData();
   }
 
   setupEventListeners();
@@ -650,7 +654,7 @@ async function loadExampleData() {
 
     // Load default photo
     try {
-      const photoResponse = await fetch('/assets/photo-example.jpg');
+      const photoResponse = await fetch('/assets/avatar.png');
       const photoBlob = await photoResponse.blob();
       const reader = new FileReader();
       reader.onloadend = async () => {
@@ -1604,7 +1608,6 @@ function updateSectionManagementUI() {
     const sectionIcon = getSectionIcon(sectionKey);
     const sectionIconMarkup = `<i class="${sectionIcon}" aria-hidden="true"></i>`;
     const sectionName = getDefaultSectionName(sectionKey); // Always use default name in sidebar
-    const badge = isFixed ? '<span class="section-item-badge">Fixed Position</span>' : '';
     const errorWarning = hasError ? '<i class="fas fa-exclamation-triangle section-error-icon" title="This section has a JSON error"></i>' : '';
 
     item.innerHTML = `
@@ -1615,7 +1618,6 @@ function updateSectionManagementUI() {
           ${sectionName}
           ${errorWarning}
         </div>
-        ${badge}
       </div>
       <div class="section-item-controls">
         <label class="section-item-toggle">
