@@ -10,6 +10,7 @@ const state = {
   pdfPreviewUrl: null,
   codeMirrorEditor: null,
   jsonModified: false,
+  templateLoaded: false,
   enabledSections: {}, // Tracks which sections are enabled/disabled
   currentEditingSection: null, // Which section is being edited in modal
   sectionErrors: {}, // Tracks which sections have JSON errors
@@ -249,7 +250,7 @@ async function loadColors() {
 
 // Setup event listeners
 function setupEventListeners() {
-  elements.loadExampleBtn.addEventListener('click', loadExampleData);
+  elements.loadExampleBtn.addEventListener('click', handleLoadExampleBtn);
   elements.fileInput.addEventListener('change', handleFileUpload);
   elements.photoInput.addEventListener('change', handlePhotoUpload);
   elements.photoRemoveBtn.addEventListener('click', handlePhotoRemove);
@@ -468,6 +469,56 @@ function setupEventListeners() {
 }
 
 // Load example data
+// Handle load/clear button toggle
+function handleLoadExampleBtn() {
+  if (state.templateLoaded) {
+    clearResumeData();
+  } else {
+    loadExampleData();
+  }
+}
+
+// Clear all resume data
+function clearResumeData() {
+  const confirmed = confirm('Are you sure you want to clear all data and start over? This action cannot be undone.');
+
+  if (confirmed) {
+    // Clear all state
+    state.resumeData = null;
+    state.photoBase64 = null;
+    state.templateLoaded = false;
+    state.enabledSections = {};
+    state.customSectionNames = {};
+    elements.jsonEditor.value = '';
+
+    // Clear preview
+    elements.previewContainer.innerHTML = `
+      <div class="preview-placeholder">
+        <i class="fas fa-file-alt"></i>
+        <p>Load data and select a theme to preview your resume</p>
+      </div>
+    `;
+
+    // Reset photo button
+    updatePhotoButtonState(false);
+
+    // Reset load button to initial state
+    const btn = elements.loadExampleBtn;
+    btn.className = 'btn btn-primary';
+    btn.innerHTML = '<i class="fas fa-file-import"></i> Load Template';
+
+    // Clear section management UI
+    updateSectionManagementUI();
+
+    // Disable export buttons
+    elements.exportPdfBtn.disabled = true;
+    elements.previewPdfBtn.disabled = true;
+    elements.exportJsonBtn.disabled = true;
+
+    flashPreviewStatus('Data cleared successfully', 'status-success');
+  }
+}
+
 async function loadExampleData() {
   try {
     const response = await fetch('/api/example-data');
@@ -500,6 +551,12 @@ async function loadExampleData() {
 
     // Auto-generate preview
     await autoGeneratePreview('json');
+
+    // Transform button to "Clear Data" mode
+    state.templateLoaded = true;
+    const btn = elements.loadExampleBtn;
+    btn.className = 'btn btn-danger';
+    btn.innerHTML = '<i class="fas fa-trash-alt"></i> Clear All Data';
   } catch (error) {
     console.error('Error loading example data:', error);
     flashPreviewStatus('Error loading example data', 'status-error');
@@ -538,6 +595,12 @@ async function handleFileUpload(event) {
 
       // Auto-generate preview
       await autoGeneratePreview('json');
+
+      // Transform button to "Clear Data" mode
+      state.templateLoaded = true;
+      const btn = elements.loadExampleBtn;
+      btn.className = 'btn btn-danger';
+      btn.innerHTML = '<i class="fas fa-trash-alt"></i> Clear All Data';
     } catch (error) {
       showError('Invalid JSON file');
     }
