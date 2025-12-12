@@ -385,6 +385,7 @@ body {
   flex-direction: column;
   gap: 12px;
   flex-shrink: 0;
+  margin-bottom: 16px;
 }
 
 .control-section.appearance-section {
@@ -588,6 +589,7 @@ body {
   gap: 24px;
   align-items: center;
   flex-wrap: nowrap;
+  margin-bottom: 16px;
 }
 
 .appearance-grid .form-group {
