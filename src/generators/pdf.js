@@ -15,6 +15,14 @@ async function generatePDF(htmlContent, outputPath) {
   try {
     const page = await browser.newPage();
 
+    // Capture console messages from page evaluation
+    page.on('console', msg => {
+      const text = msg.text();
+      if (text.includes('GDPR positioning')) {
+        console.log(`  ${text}`);
+      }
+    });
+
     // Set viewport to match A4 dimensions for consistent rendering
     // A4 at 96 DPI: 794px x 1123px
     await page.setViewport({
@@ -67,45 +75,80 @@ async function generatePDF(htmlContent, outputPath) {
       // Continue anyway - Font Awesome should still work
     }
 
-    // Position GDPR at absolute bottom of page 2
+    // Dynamic GDPR positioning based on content length
     await page.evaluate(() => {
       // A4 dimensions: 210mm x 297mm
-      // 2 pages = 594mm total
-      // PDF margins: 20px top + 20px bottom = ~10.6mm per page = ~21.2mm for 2 pages
-      // We need body to be exactly 2 pages minus the PDF margins
+      // Thresholds for detecting which scenario applies (with buffer for variations)
+      const ONE_PAGE_THRESHOLD = 280; // mm (detection threshold)
+      const TWO_PAGE_THRESHOLD = 590; // mm (detection threshold)
 
-      // Using mm units for accuracy with A4
-      // 2 pages = 594mm, minus ~21mm for PDF margins ≈ 573mm
-      // But we also need to account for body padding (40px ≈ 10.6mm)
+      // Actual body heights to ensure GDPR ends (not starts) at bottom of page
+      const ONE_PAGE_BODY_HEIGHT = 277; // mm (1 page minus margins)
+      const TWO_PAGE_BODY_HEIGHT = 568; // mm (2 pages minus margins)
 
       const body = document.body;
       const gdprClause = document.querySelector('.gdpr-clause');
 
-      if (gdprClause) {
-        // Remove flexbox and set fixed height in mm (2 A4 pages minus margins)
-        body.style.display = 'block';
-        body.style.minHeight = 'auto';
-        body.style.height = '568mm'; // 2 pages (594mm) minus margins, tuned to push GDPR to very bottom
-        body.style.position = 'relative';
-        body.style.overflow = 'visible';
-        body.style.boxSizing = 'border-box';
+      if (!gdprClause) {
+        return;
+      }
 
-        // Style content wrapper
-        const contentWrapper = document.querySelector('.content-wrapper');
-        if (contentWrapper) {
-          contentWrapper.style.display = 'block';
-          contentWrapper.style.flex = 'none';
-        }
+      // Prepare body for measurement
+      body.style.display = 'block';
+      body.style.minHeight = 'auto';
+      body.style.height = 'auto';
+      body.style.position = 'relative';
+      body.style.overflow = 'visible';
+      body.style.boxSizing = 'border-box';
 
-        // Position GDPR at absolute bottom of the 2-page body
+      // Style content wrapper
+      const contentWrapper = document.querySelector('.content-wrapper');
+      if (contentWrapper) {
+        contentWrapper.style.display = 'block';
+        contentWrapper.style.flex = 'none';
+      }
+
+      // Temporarily hide GDPR to measure content height
+      gdprClause.style.display = 'none';
+      const contentHeight = body.scrollHeight;
+
+      // Show GDPR and measure total height
+      gdprClause.style.display = 'block';
+      gdprClause.style.position = 'relative';
+      gdprClause.style.margin = '0';
+      gdprClause.style.paddingTop = '20px';
+      gdprClause.style.borderTop = '1px solid #ecf0f1';
+      gdprClause.style.backgroundColor = '#fff';
+
+      const totalHeight = body.scrollHeight;
+      const gdprHeight = totalHeight - contentHeight;
+
+      // Convert pixels to mm (96 DPI: 1mm ≈ 3.78px)
+      const totalHeightMm = totalHeight / 3.78;
+
+      // Determine positioning strategy based on total content height
+      if (totalHeightMm <= ONE_PAGE_THRESHOLD) {
+        // SCENARIO 1: Content fits on one page - fix GDPR at bottom of page 1
+        console.log(`GDPR positioning: Single page (${totalHeightMm.toFixed(0)}mm)`);
+        body.style.height = ONE_PAGE_BODY_HEIGHT + 'mm';
         gdprClause.style.position = 'absolute';
         gdprClause.style.bottom = '0';
         gdprClause.style.left = '0';
         gdprClause.style.right = '0';
-        gdprClause.style.margin = '0';
-        gdprClause.style.paddingTop = '20px';
-        gdprClause.style.borderTop = '1px solid #ecf0f1';
-        gdprClause.style.backgroundColor = '#fff';
+      } else if (totalHeightMm <= TWO_PAGE_THRESHOLD) {
+        // SCENARIO 2: Content fits on two pages - fix GDPR at bottom of page 2
+        console.log(`GDPR positioning: Two pages (${totalHeightMm.toFixed(0)}mm)`);
+        body.style.height = TWO_PAGE_BODY_HEIGHT + 'mm';
+        gdprClause.style.position = 'absolute';
+        gdprClause.style.bottom = '0';
+        gdprClause.style.left = '0';
+        gdprClause.style.right = '0';
+      } else {
+        // SCENARIO 3: Content exceeds two pages - place GDPR after content (natural flow)
+        console.log(`GDPR positioning: Multi-page (${totalHeightMm.toFixed(0)}mm)`);
+        body.style.height = 'auto';
+        gdprClause.style.position = 'relative';
+        // GDPR will naturally flow after content
       }
     });
 
