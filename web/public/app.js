@@ -96,6 +96,7 @@ const elements = {
   cancelSkillFormBtn: document.getElementById('cancelSkillFormBtn'),
   saveSkillFormBtn: document.getElementById('saveSkillFormBtn'),
   experienceModal: document.getElementById('experienceModal'),
+  experienceListContainer: document.getElementById('experienceList')?.closest('.experience-list-container'),
   experienceList: document.getElementById('experienceList'),
   addExperienceBtn: document.getElementById('addExperienceBtn'),
   closeExperienceModalBtn: document.getElementById('closeExperienceModalBtn'),
@@ -115,6 +116,7 @@ const elements = {
   saveExperienceFormBtn: document.getElementById('saveExperienceFormBtn'),
   // Education Modal
   educationModal: document.getElementById('educationModal'),
+  educationListContainer: document.getElementById('educationList')?.closest('.experience-list-container'),
   educationList: document.getElementById('educationList'),
   addEducationBtn: document.getElementById('addEducationBtn'),
   closeEducationModalBtn: document.getElementById('closeEducationModalBtn'),
@@ -516,6 +518,11 @@ function setupEventListeners() {
       requestAnimationFrame(renderEducationBadges);
     });
   }
+
+  window.addEventListener('resize', () => {
+    updateListVerticalCentering(elements.experienceList);
+    updateListVerticalCentering(elements.educationList);
+  });
 
   elements.experienceFormModal.addEventListener('click', (e) => {
     if (e.target === elements.experienceFormModal) {
@@ -2927,6 +2934,7 @@ function populateEducationList() {
     row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
   });
 
+  requestAnimationFrame(() => updateListVerticalCentering(elements.educationList));
   renderEducationBadges();
 }
 function populateExperienceList() {
@@ -2983,6 +2991,7 @@ function populateExperienceList() {
     row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
   });
 
+  requestAnimationFrame(() => updateListVerticalCentering(elements.experienceList));
   renderExperienceBadges();
 }
 
@@ -3073,14 +3082,11 @@ function renderExperienceBadges() {
       return;
     }
 
-    const newestRow = rows[0];
-    const oldestRow = rows[rows.length - 1];
-
     const newestBadge = getOrCreateExperienceBadge('experienceBadgeNewest', 'Most recent', 'age-newest');
     const oldestBadge = getOrCreateExperienceBadge('experienceBadgeOldest', 'Oldest', 'age-oldest');
 
-    positionExperienceBadge(newestBadge, newestRow);
-    positionExperienceBadge(oldestBadge, oldestRow);
+    positionExperienceBadge(newestBadge, 'top');
+    positionExperienceBadge(oldestBadge, 'bottom');
   });
 }
 
@@ -3092,7 +3098,8 @@ function getOrCreateExperienceBadge(id, label, extraClass) {
     el.className = `experience-age-pill ${extraClass}`;
     el.textContent = label;
     el.setAttribute('aria-hidden', 'true');
-    elements.experienceList.appendChild(el);
+    const container = elements.experienceListContainer || elements.experienceList;
+    container.appendChild(el);
   } else {
     el.className = `experience-age-pill ${extraClass}`;
     el.textContent = label;
@@ -3100,10 +3107,10 @@ function getOrCreateExperienceBadge(id, label, extraClass) {
   return el;
 }
 
-function positionExperienceBadge(badgeEl, rowEl) {
-  if (!badgeEl || !rowEl) return;
-  const top = rowEl.offsetTop - elements.experienceList.scrollTop + rowEl.offsetHeight / 2;
-  badgeEl.style.top = `${top}px`;
+function positionExperienceBadge(badgeEl, position) {
+  if (!badgeEl) return;
+  badgeEl.style.top = position === 'top' ? '20px' : 'auto';
+  badgeEl.style.bottom = position === 'bottom' ? '20px' : 'auto';
   badgeEl.style.display = 'inline-flex';
 }
 
@@ -3246,14 +3253,11 @@ function renderEducationBadges() {
       return;
     }
 
-    const newestRow = rows[0];
-    const oldestRow = rows[rows.length - 1];
-
     const newestBadge = getOrCreateEducationBadge('educationBadgeNewest', 'Most recent', 'age-newest');
     const oldestBadge = getOrCreateEducationBadge('educationBadgeOldest', 'Oldest', 'age-oldest');
 
-    positionEducationBadge(newestBadge, newestRow);
-    positionEducationBadge(oldestBadge, oldestRow);
+    positionEducationBadge(newestBadge, 'top');
+    positionEducationBadge(oldestBadge, 'bottom');
   });
 }
 
@@ -3265,7 +3269,8 @@ function getOrCreateEducationBadge(id, label, extraClass) {
     el.className = `experience-age-pill ${extraClass}`;
     el.textContent = label;
     el.setAttribute('aria-hidden', 'true');
-    elements.educationList.appendChild(el);
+    const container = elements.educationListContainer || elements.educationList;
+    container.appendChild(el);
   } else {
     el.className = `experience-age-pill ${extraClass}`;
     el.textContent = label;
@@ -3273,11 +3278,17 @@ function getOrCreateEducationBadge(id, label, extraClass) {
   return el;
 }
 
-function positionEducationBadge(badgeEl, rowEl) {
-  if (!badgeEl || !rowEl) return;
-  const top = rowEl.offsetTop - elements.educationList.scrollTop + rowEl.offsetHeight / 2;
-  badgeEl.style.top = `${top}px`;
+function positionEducationBadge(badgeEl, position) {
+  if (!badgeEl) return;
+  badgeEl.style.top = position === 'top' ? '20px' : 'auto';
+  badgeEl.style.bottom = position === 'bottom' ? '20px' : 'auto';
   badgeEl.style.display = 'inline-flex';
+}
+
+function updateListVerticalCentering(listEl) {
+  if (!listEl) return;
+  const shouldCenter = listEl.scrollHeight <= listEl.clientHeight;
+  listEl.classList.toggle('is-centered', shouldCenter);
 }
 
 function removeEducationBadges() {

@@ -41,11 +41,16 @@ async function generatePDF(htmlContent, outputPath) {
     await page.addStyleTag({
       content: `
         img.emoji {
-          height: 1em;
-          width: 1em;
+          height: 1em !important;
+          width: 1em !important;
+          max-height: 1em !important;
+          max-width: 1em !important;
+          min-height: 1em !important;
+          min-width: 1em !important;
           margin: 0 0.05em 0 0.1em;
           vertical-align: -0.1em;
           display: inline-block;
+          object-fit: contain;
         }
       `
     });

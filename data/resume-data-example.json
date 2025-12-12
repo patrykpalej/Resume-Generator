@@ -1,15 +1,15 @@
 {
   "personalInfo": {
-    "name": "🔥 Welcome to <span style='background:linear-gradient(90deg,#ff4d4d,#ffd32a);-webkit-background-clip:text;color:transparent'>cre8ive.cv</span>",
-    "title": "A lightweight JSON oriented resume generator for IT professionals",
+    "name": "🔥 Welcome to <span style='background:linear-gradient(90deg,#ff3b00,#ff8c1a,#ffcc33);-webkit-background-clip:text;color:transparent'>cre8ive.cv</span>",
+    "title": "Interactive JSON oriented resume generator for IT professionals",
     "email": "feedback@cre8ive.cv",
     "phone": "",
-    "website": "https://cre8ive.cv",
+    "website": "https://palej.dev",
     "linkedin": "https://linkedin.com/in/patryk-palej",
     "github": "https://github.com/patrykpalej",
     "location": ""
   },
-  "summary": "You are about to use <strong>cre8ive.cv</strong> – a tool for generating a <strong>customizable</strong> and <strong>easily editable</strong> resume. Its data layer is a pure <strong>JSON</strong> which can be exported and reimported. The generator supports export to PDF format. You can use a variety of themes and colors. The app <strong>respects your privacy</strong> – no personal data is stored on the server side after rendering your JSON to PDF. For extra security you can also self-host it on your own local machine.<br>Below you can find the project author’s contact information.",
+  "summary": "You are about to use <strong>cre8ive.cv</strong> – a tool for generating a <strong>customizable</strong> and <strong>easily editable</strong> resume. Its data layer is a pure <strong>JSON</strong> which can be exported and reimported (including photo in base64). The generator supports export to PDF format. You can use a variety of themes and colors. The app <strong>respects your privacy</strong> – no personal data is stored on the server side after rendering your JSON to PDF. For extra security you can also self-host it on your own local machine.<br>Below you can find the project author’s contact information.",
   "skills": [
     {
       "name": "Working knowledge",
