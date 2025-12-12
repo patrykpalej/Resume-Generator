@@ -163,10 +163,119 @@ const elements = {
   modalSectionIcon: document.getElementById('modalSectionIcon')
 };
 
+// LocalStorage persistence functions
+const STORAGE_KEY = 'resumeGenerator';
+
+function saveStateToLocalStorage() {
+  try {
+    const dataToSave = {
+      resumeData: state.resumeData,
+      photoBase64: state.photoBase64,
+      enabledSections: state.enabledSections,
+      customSectionNames: state.customSectionNames,
+      selectedTheme: state.selectedTheme,
+      selectedColor: state.selectedColor,
+      templateLoaded: state.templateLoaded
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+
+    // Check storage size as a warning
+    const storageSize = new Blob([localStorage.getItem(STORAGE_KEY)]).size;
+    if (storageSize > 4 * 1024 * 1024) { // Warn if over 4MB
+      console.warn('LocalStorage data is large:', (storageSize / 1024 / 1024).toFixed(2), 'MB');
+    }
+  } catch (error) {
+    console.error('Failed to save to localStorage:', error);
+    // If quota exceeded, show message to user
+    if (error.name === 'QuotaExceededError') {
+      showError('Storage quota exceeded. Consider using a smaller photo or clearing old data.');
+    }
+  }
+}
+
+function loadStateFromLocalStorage() {
+  try {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (!savedData) {
+      return false;
+    }
+
+    const parsedData = JSON.parse(savedData);
+
+    // Restore state
+    state.resumeData = parsedData.resumeData;
+    state.photoBase64 = parsedData.photoBase64;
+    state.enabledSections = parsedData.enabledSections || {};
+    state.customSectionNames = parsedData.customSectionNames || {};
+    state.selectedTheme = parsedData.selectedTheme;
+    state.selectedColor = parsedData.selectedColor;
+    state.templateLoaded = parsedData.templateLoaded || false;
+
+    // Update UI
+    if (state.resumeData) {
+      elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+      updateSectionManagementUI();
+    }
+
+    // Update photo button state
+    if (state.photoBase64) {
+      updatePhotoButtonState(true);
+    }
+
+    // Set theme and color if they were saved
+    if (state.selectedTheme) {
+      elements.themeSelect.value = state.selectedTheme;
+
+      // Check if the theme is monochromatic and show/hide color selector
+      const selectedThemeObj = state.themes.find(t => t.name === state.selectedTheme);
+      if (selectedThemeObj) {
+        if (selectedThemeObj.monochromatic) {
+          elements.colorGroup.style.display = 'none';
+        } else {
+          elements.colorGroup.style.display = 'block';
+        }
+      }
+    }
+    if (state.selectedColor && !state.themes.find(t => t.name === state.selectedTheme)?.monochromatic) {
+      elements.colorSelect.value = state.selectedColor;
+    }
+
+    console.log('Loaded resume data from localStorage');
+    return true;
+  } catch (error) {
+    console.error('Failed to load from localStorage:', error);
+    return false;
+  }
+}
+
+function clearAllLocalStorage() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    console.log('Cleared localStorage');
+  } catch (error) {
+    console.error('Failed to clear localStorage:', error);
+  }
+}
+
 // Initialize app
 async function init() {
   await loadThemes();
   await loadColors();
+
+  // Try to load saved state from localStorage
+  const loaded = loadStateFromLocalStorage();
+  if (loaded && state.resumeData) {
+    // Transform button to "Clear Data" mode
+    const btn = elements.loadExampleBtn;
+    btn.className = 'btn btn-danger';
+    btn.innerHTML = '<i class="fas fa-trash-alt"></i> Clear All Data';
+
+    // Generate preview first, then show success message
+    setPreviewStatus('Restoring previous session...', 'status-info');
+    await autoGeneratePreview('restore');
+    flashPreviewStatus('Previous session restored from browser storage', 'status-success');
+  }
+
   setupEventListeners();
   updateButtonStates();
 }
@@ -515,6 +624,9 @@ function clearResumeData() {
     elements.previewPdfBtn.disabled = true;
     elements.exportJsonBtn.disabled = true;
 
+    // Clear localStorage
+    clearAllLocalStorage();
+
     flashPreviewStatus('Data cleared successfully', 'status-success');
   }
 }
@@ -538,6 +650,7 @@ async function loadExampleData() {
         state.photoBase64 = reader.result;
         updatePhotoButtonState(true);
         await autoGeneratePreview('photo');
+        saveStateToLocalStorage();
       };
       reader.readAsDataURL(photoBlob);
     } catch (photoError) {
@@ -557,6 +670,9 @@ async function loadExampleData() {
     const btn = elements.loadExampleBtn;
     btn.className = 'btn btn-danger';
     btn.innerHTML = '<i class="fas fa-trash-alt"></i> Clear All Data';
+
+    // Save to localStorage
+    saveStateToLocalStorage();
   } catch (error) {
     console.error('Error loading example data:', error);
     flashPreviewStatus('Error loading example data', 'status-error');
@@ -601,6 +717,9 @@ async function handleFileUpload(event) {
       const btn = elements.loadExampleBtn;
       btn.className = 'btn btn-danger';
       btn.innerHTML = '<i class="fas fa-trash-alt"></i> Clear All Data';
+
+      // Save to localStorage
+      saveStateToLocalStorage();
     } catch (error) {
       showError('Invalid JSON file');
     }
@@ -632,6 +751,9 @@ async function handlePhotoUpload(event) {
 
     // Auto-generate preview
     await autoGeneratePreview('photo');
+
+    // Save to localStorage
+    saveStateToLocalStorage();
   };
   reader.readAsDataURL(file);
 }
@@ -650,6 +772,9 @@ async function handlePhotoRemove() {
 
   // Auto-generate preview
   await autoGeneratePreview('photo');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Update photo button state (show upload or remove button)
@@ -719,6 +844,9 @@ async function handleThemeChange(event) {
 
   // Auto-generate preview
   await autoGeneratePreview('theme');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Handle color selection
@@ -728,6 +856,9 @@ async function handleColorChange(event) {
 
   // Auto-generate preview
   await autoGeneratePreview('color');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Update button states
@@ -1522,6 +1653,9 @@ function handleSectionToggle(sectionKey, enabled) {
 
   // Auto-regenerate preview
   autoGeneratePreview('section-toggle');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Get icon for section
@@ -1717,6 +1851,9 @@ function renameSectionPrompt(sectionKey) {
     autoGeneratePreview('section-edit');
 
     flashPreviewStatus(`CV section header renamed to "${displayName}"`, 'status-success');
+
+    // Save to localStorage
+    saveStateToLocalStorage();
   };
 
   // Cancel function
@@ -2028,6 +2165,9 @@ function updateJsonOrder() {
 
     // Auto-generate preview immediately
     autoGeneratePreview('section-reorder');
+
+    // Save to localStorage
+    saveStateToLocalStorage();
   } catch (error) {
     console.error('Error updating JSON order:', error);
   }
@@ -2225,6 +2365,9 @@ function deleteSkill(skillIndex) {
   populateSkillsList();
   flashPreviewStatus('Skill group deleted', 'status-success');
   debouncedSkillPreview();
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 function closeSkillFormModal(reopenList = true) {
@@ -2313,6 +2456,9 @@ function saveSkillForm() {
   populateSkillsList();
   elements.skillsModal.classList.add('show');
   debouncedSkillPreview();
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 function populateSkillItems(items) {
@@ -2374,6 +2520,9 @@ function updateSkillFractionInline(index, value, showStatus = false) {
   }
 
   debouncedSkillPreview();
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 function refreshSkillFractionPills() {
@@ -2553,6 +2702,9 @@ function deleteProject(projectIndex) {
   populateProjectsList();
   flashPreviewStatus('Project deleted', 'status-success');
   autoGeneratePreview('section-edit');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 function closeProjectFormModal() {
@@ -2618,6 +2770,9 @@ function saveProjectForm() {
   closeProjectFormModal();
   populateProjectsList();
   autoGeneratePreview('section-edit');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Experience Management Functions
@@ -3155,6 +3310,9 @@ function deleteExperience(experienceIndex) {
   populateExperienceList();
   flashPreviewStatus('Experience deleted', 'status-success');
   autoGeneratePreview('section-edit');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Education Form Functions
@@ -3201,6 +3359,9 @@ function deleteEducation(index) {
   populateEducationList();
   flashPreviewStatus('Education entry deleted', 'status-success');
   autoGeneratePreview('section-edit');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Experience Form Functions
@@ -3319,6 +3480,9 @@ function saveExperienceForm() {
   closeExperienceFormModal();
   openExperienceManagementModal();
   autoGeneratePreview('section-edit');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Validate date format (YYYY-MM)
@@ -3428,6 +3592,9 @@ function saveEducationForm() {
 
   updateSectionManagementUI();
   autoGeneratePreview('section-edit');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Helper function to extract slug from LinkedIn URL
@@ -3568,6 +3735,9 @@ function savePersonalInfoForm() {
   updateSectionManagementUI();
   flashPreviewStatus('Personal information updated successfully', 'status-success');
   autoGeneratePreview('section-edit');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Simple email validation
@@ -3633,6 +3803,9 @@ function saveGdprForm() {
   updateSectionManagementUI();
   flashPreviewStatus('GDPR clause updated successfully', 'status-success');
   autoGeneratePreview('section-edit');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // Summary Modal Functions
@@ -3693,6 +3866,9 @@ function saveSummaryForm() {
   updateSectionManagementUI();
   flashPreviewStatus('Summary updated successfully', 'status-success');
   autoGeneratePreview('section-edit');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
 }
 
 // PDF Preview Functions
