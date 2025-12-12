@@ -26,7 +26,7 @@ function getStyles(palette) {
     }
 
     .project-link-line {
-      font-size: 13px;
+      font-size: 11px;
       color: ${palette.primary};
       font-style: normal;
       font-weight: 400;
@@ -64,6 +64,7 @@ function getStyles(palette) {
       padding-bottom: 20px;
       margin-bottom: 30px;
       position: relative;
+      padding: 15px;
       display: grid;
       grid-template-columns: 1fr auto;
       grid-template-rows: auto auto auto;
@@ -113,7 +114,7 @@ function getStyles(palette) {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 14px;
+      font-size: 12px;
       color: #333;
       min-width: 0;
       overflow-wrap: break-word;
@@ -153,21 +154,23 @@ function getStyles(palette) {
     }
 
     h1 {
-      font-size: 36px;
+      font-size: 32px;
       color: #1a1a1a;
       margin-bottom: 0;
       font-weight: 700;
+      letter-spacing: -0.5px;
     }
 
     h1::before {
       content: "$ whoami > ";
       color: ${palette.accent};
       font-weight: 400;
-      font-size: 14px;
+      font-size: 12px;
+      margin-right: 5px;
     }
 
     .title {
-      font-size: 20px;
+      font-size: 18px;
       color: #333;
       margin-bottom: 0;
       font-weight: 400;
@@ -179,13 +182,13 @@ function getStyles(palette) {
     }
 
     .summary {
-      font-size: 15px;
-      line-height: 1.8;
+      font-size: 13px;
+      line-height: 1.6;
       color: #222;
       margin-top: 0;
       margin-bottom: 0;
       font-style: normal;
-      padding-left: 15px;
+      padding-left: 12px;
       border-left: 3px solid ${palette.primary};
     }
 
@@ -194,12 +197,12 @@ function getStyles(palette) {
     }
 
     h2 {
-      font-size: 22px;
+      font-size: 20px;
       color: ${palette.primary};
-      border-bottom: 1px solid ${palette.primary};
+      border-bottom: none;
       padding-bottom: 8px;
       margin-bottom: 15px;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
       font-weight: 700;
       page-break-after: avoid;
       page-break-inside: avoid;
@@ -208,11 +211,13 @@ function getStyles(palette) {
     h2::before {
       content: "## ";
       color: ${palette.accent};
+      margin-right: 5px;
     }
 
     .experience-item, .education-item, .project-item {
       margin-bottom: 20px;
       page-break-inside: avoid;
+      padding-left: 12px;
     }
 
     .experience-header, .education-header {
@@ -223,7 +228,7 @@ function getStyles(palette) {
     }
 
     .position, .degree, .project-name {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: ${palette.primary};
     }
@@ -231,10 +236,11 @@ function getStyles(palette) {
     .position::before, .degree::before, .project-name::before {
       content: "> ";
       color: ${palette.accent};
+      margin-right: 3px;
     }
 
     .company, .institution {
-      font-size: 16px;
+      font-size: 14px;
       color: #333;
       margin-bottom: 3px;
       font-weight: 400;
@@ -243,19 +249,21 @@ function getStyles(palette) {
     .company::before, .institution::before {
       content: "@ ";
       color: ${palette.accent};
+      margin-right: 3px;
     }
 
     .education-level {
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 400;
       color: #555;
     }
 
     .date-location {
-      font-size: 16px;
+      font-size: 14px;
       color: ${palette.primary};
       font-style: normal;
       font-weight: 500;
+      padding: 4px 12px;
     }
 
     .date-location::before {
@@ -276,8 +284,9 @@ function getStyles(palette) {
 
     li {
       margin-bottom: 5px;
-      font-size: 14px;
+      font-size: 12px;
       color: #222;
+      line-height: 1.6;
     }
 
     li::before {
@@ -301,7 +310,7 @@ function getStyles(palette) {
     }
 
     .skill-category h3 {
-      font-size: 16px;
+      font-size: 14px;
       color: ${palette.primary};
       margin-bottom: 8px;
       text-transform: uppercase;
@@ -323,14 +332,14 @@ function getStyles(palette) {
       background: #fff;
       padding: 5px 12px;
       border-radius: 0;
-      font-size: 13px;
+      font-size: 11px;
       color: #333;
       border: 1px solid ${palette.primary};
       white-space: nowrap;
     }
 
     .projects-intro {
-      font-size: 14px;
+      font-size: 12px;
       color: #222;
       margin-bottom: 10px;
       padding-bottom: 8px;
@@ -356,21 +365,17 @@ function getStyles(palette) {
     }
 
     .project-description {
-      font-size: 14px;
+      font-size: 12px;
       color: #222;
       margin-bottom: 5px;
+      line-height: 1.6;
     }
 
     .technologies {
-      font-size: 13px;
+      font-size: 11px;
       color: ${palette.primary};
       font-style: normal;
       font-weight: 400;
-    }
-
-    .technologies::before {
-      content: "tech: ";
-      color: ${palette.accent};
     }
 
     .gdpr-clause {

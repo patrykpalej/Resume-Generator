@@ -60,6 +60,7 @@ function getStyles() {
       padding-bottom: 20px;
       margin-bottom: 30px;
       position: relative;
+      padding: 15px;
       display: grid;
       grid-template-columns: 1fr auto;
       grid-template-rows: auto auto auto;
@@ -149,7 +150,7 @@ function getStyles() {
       color: #1a1a1a;
       margin-bottom: 0;
       font-weight: 300;
-      letter-spacing: 2px;
+      letter-spacing: -0.5px;
       text-transform: uppercase;
     }
 
@@ -158,7 +159,6 @@ function getStyles() {
       color: #666;
       margin-bottom: 0;
       font-weight: 400;
-      letter-spacing: 1px;
       text-transform: uppercase;
     }
 
@@ -182,7 +182,7 @@ function getStyles() {
       border-bottom: none;
       padding-bottom: 8px;
       margin-bottom: 15px;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       font-weight: 400;
       page-break-after: avoid;
       page-break-inside: avoid;
@@ -224,6 +224,7 @@ function getStyles() {
       color: #000;
       font-style: normal;
       font-weight: 500;
+      padding: 4px 12px;
     }
 
     ul {
@@ -237,10 +238,11 @@ function getStyles() {
       font-size: 14px;
       color: #333;
       font-weight: 300;
+      line-height: 1.6;
     }
 
     li::before {
-      content: "—";
+      content: "• ";
       margin-right: 8px;
       color: #999;
     }
@@ -253,8 +255,7 @@ function getStyles() {
 
     .skill-category {
       background: transparent;
-      padding: 15px;
-      padding-left: 0;
+      padding: 0;
       border-radius: 0;
       border-left: none;
       min-width: 0;
@@ -277,24 +278,14 @@ function getStyles() {
     }
 
     .skill-tag {
-      background: transparent;
+      background: #fff;
       padding: 5px 12px;
-      padding-left: 0;
-      border-radius: 0;
+      border-radius: 20px;
       font-size: 13px;
       color: #000;
-      border: none;
+      border: 1px solid #d0d0d0;
       font-weight: 300;
       white-space: nowrap;
-    }
-
-    .skill-tag::after {
-      content: " /";
-      color: #ccc;
-    }
-
-    .skill-tag:last-child::after {
-      content: "";
     }
 
     .projects-intro {
@@ -329,6 +320,7 @@ function getStyles() {
       color: #333;
       margin-bottom: 5px;
       font-weight: 300;
+      line-height: 1.6;
     }
 
     .technologies {

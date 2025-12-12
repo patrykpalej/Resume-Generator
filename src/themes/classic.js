@@ -58,6 +58,7 @@ function getStyles() {
       padding-bottom: 20px;
       margin-bottom: 30px;
       position: relative;
+      padding: 15px;
       display: grid;
       grid-template-columns: 1fr auto;
       grid-template-rows: auto auto auto;
@@ -148,7 +149,7 @@ function getStyles() {
       color: #1a1a1a;
       margin-bottom: 0;
       font-weight: 700;
-      letter-spacing: 0.5px;
+      letter-spacing: -0.5px;
     }
 
     .title {
@@ -187,6 +188,7 @@ function getStyles() {
     .experience-item, .education-item, .project-item {
       margin-bottom: 20px;
       page-break-inside: avoid;
+      padding-left: 15px;
     }
 
     .experience-header, .education-header {
@@ -222,6 +224,7 @@ function getStyles() {
       font-style: normal;
       font-weight: 600;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 4px 12px;
     }
 
     ul {
@@ -233,6 +236,7 @@ function getStyles() {
       margin-bottom: 5px;
       font-size: 14px;
       color: #333;
+      line-height: 1.6;
     }
 
     .skills-grid {
@@ -309,6 +313,7 @@ function getStyles() {
       font-size: 14px;
       color: #333;
       margin-bottom: 5px;
+      line-height: 1.6;
     }
 
     .technologies {

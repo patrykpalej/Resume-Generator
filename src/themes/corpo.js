@@ -158,7 +158,7 @@ function getStyles(palette) {
       margin-bottom: 0;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: -0.5px;
     }
 
     .title {
@@ -167,7 +167,6 @@ function getStyles(palette) {
       margin-bottom: 0;
       font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .summary {
@@ -235,6 +234,7 @@ function getStyles(palette) {
       color: ${palette.primary};
       font-style: italic;
       font-weight: 500;
+      padding: 4px 12px;
     }
 
     ul {
@@ -246,6 +246,7 @@ function getStyles(palette) {
       margin-bottom: 5px;
       font-size: 14px;
       color: #444;
+      line-height: 1.6;
     }
 
     .skills-grid {
@@ -304,7 +305,7 @@ function getStyles(palette) {
     }
 
     section:has(.projects-intro) h2 {
-      margin-bottom: 10px;
+      margin-bottom: 2px;
     }
 
     .projects-grid {
@@ -318,6 +319,7 @@ function getStyles(palette) {
       font-size: 14px;
       color: #444;
       margin-bottom: 5px;
+      line-height: 1.6;
     }
 
     .technologies {
