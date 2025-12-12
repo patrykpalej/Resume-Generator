@@ -1,5 +1,7 @@
+assets/
 node_modules/
 output/
+data/
 
 .claude
 
@@ -10,9 +12,4 @@ yarn-error.log*
 pnpm-debug.log*
 *.log
 
-# Resume data JSONs (keep the public example)
-resume-data.json
-
-# Photos (keep the public example)
 photo.jpg
-
