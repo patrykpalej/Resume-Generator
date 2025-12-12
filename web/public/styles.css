@@ -590,7 +590,8 @@ body {
 .contribute-link {
   font-size: 13px;
   color: var(--text-secondary);
-  margin-top: 8px;
+  margin: 0;
+  line-height: 1.15;
 }
 
 .contribute-link a {
@@ -1683,6 +1684,21 @@ body {
 .btn-danger:hover:not(:disabled) {
   background: #b34b45;
   box-shadow: 0 2px 4px var(--shadow);
+}
+
+.photo-remove-btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid #c85a54;
+}
+
+.photo-remove-btn:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.photo-remove-btn .fa-trash-alt {
+  color: #c85a54;
 }
 
 #addProjectBtn {
