@@ -329,16 +329,45 @@ function getStyles(palette) {
       font-weight: 500;
     }
 
-    .gdpr-clause {
+    .gdpr-watermark-wrapper {
       margin-top: auto;
+      margin-bottom: 0;
+      padding-bottom: 0;
+      page-break-inside: avoid;
+      page-break-before: auto;
+    }
+
+    .gdpr-clause {
       padding-top: 20px;
       border-top: 2px solid ${palette.primary};
       font-size: 10px;
       color: #666;
       line-height: 1.4;
       text-align: justify;
-      page-break-inside: avoid;
-      page-break-before: auto;
+    }
+
+    .watermark {
+      margin-top: 0px;
+      margin-bottom: 0;
+      padding-top: 3px;
+      padding-bottom: 0;
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+      font-style: italic;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .watermark a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .watermark a:hover {
+      text-decoration: underline;
     }
 
     @media print {
@@ -378,7 +407,7 @@ function getStyles(palette) {
         -webkit-print-color-adjust: exact;
       }
 
-      .gdpr-clause {
+      .gdpr-watermark-wrapper {
         margin-top: auto;
         page-break-inside: avoid;
         page-break-before: auto;

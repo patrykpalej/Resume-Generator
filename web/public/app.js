@@ -6,6 +6,7 @@ const state = {
   colors: [],
   selectedTheme: null,
   selectedColor: null,
+  showWatermark: true, // Whether to show the watermark
   currentHtml: null,
   pdfPreviewUrl: null,
   codeMirrorEditor: null,
@@ -33,6 +34,7 @@ const elements = {
   themeSelect: document.getElementById('themeSelect'),
   colorSelect: document.getElementById('colorSelect'),
   colorGroup: document.getElementById('colorGroup'),
+  showWatermarkCheckbox: document.getElementById('showWatermarkCheckbox'),
   previewPdfBtn: document.getElementById('previewPdfBtn'),
   exportPdfBtn: document.getElementById('exportPdfBtn'),
   exportJsonBtn: document.getElementById('exportJsonBtn'),
@@ -209,6 +211,7 @@ function loadStateFromLocalStorage() {
     state.customSectionNames = parsedData.customSectionNames || {};
     state.selectedTheme = parsedData.selectedTheme;
     state.selectedColor = parsedData.selectedColor;
+    state.showWatermark = parsedData.showWatermark !== undefined ? parsedData.showWatermark : true;
     state.templateLoaded = parsedData.templateLoaded || false;
 
     // Update UI
@@ -239,6 +242,9 @@ function loadStateFromLocalStorage() {
     if (state.selectedColor && !state.themes.find(t => t.name === state.selectedTheme)?.monochromatic) {
       elements.colorSelect.value = state.selectedColor;
     }
+
+    // Set watermark checkbox
+    elements.showWatermarkCheckbox.checked = state.showWatermark;
 
     console.log('Loaded resume data from localStorage');
     return true;
@@ -365,6 +371,7 @@ function setupEventListeners() {
   elements.photoRemoveBtn.addEventListener('click', handlePhotoRemove);
   elements.themeSelect.addEventListener('change', handleThemeChange);
   elements.colorSelect.addEventListener('change', handleColorChange);
+  elements.showWatermarkCheckbox.addEventListener('change', handleWatermarkChange);
   elements.previewPdfBtn.addEventListener('click', showPdfPreview);
   elements.exportPdfBtn.addEventListener('click', exportToPdf);
   elements.exportJsonBtn.addEventListener('click', exportToJson);
@@ -861,6 +868,16 @@ async function handleColorChange(event) {
   saveStateToLocalStorage();
 }
 
+async function handleWatermarkChange(event) {
+  state.showWatermark = event.target.checked;
+
+  // Auto-generate preview
+  await autoGeneratePreview('watermark');
+
+  // Save to localStorage
+  saveStateToLocalStorage();
+}
+
 // Update button states
 function updateButtonStates() {
   const hasTheme = state.selectedTheme !== null;
@@ -905,7 +922,8 @@ async function generatePreview() {
         themeName: state.selectedTheme,
         colorName: state.selectedColor,
         photoBase64: state.photoBase64,
-        customSectionNames: state.customSectionNames
+        customSectionNames: state.customSectionNames,
+        showWatermark: state.showWatermark
       })
     });
 
@@ -948,6 +966,7 @@ function exportToJson() {
       enabledSections: state.enabledSections,
       selectedTheme: state.selectedTheme,
       selectedColor: state.selectedColor,
+      showWatermark: state.showWatermark,
       customSectionNames: state.customSectionNames,
       photoBase64: state.photoBase64
     }
@@ -1018,6 +1037,10 @@ function applyMetaSettings(meta) {
     state.customSectionNames = { ...meta.customSectionNames };
   }
 
+  // Apply watermark setting (default to true if not specified)
+  state.showWatermark = meta.showWatermark !== undefined ? meta.showWatermark : true;
+  elements.showWatermarkCheckbox.checked = state.showWatermark;
+
   updateButtonStates();
 }
 
@@ -1051,7 +1074,8 @@ async function exportToPdf() {
         themeName: state.selectedTheme,
         colorName: state.selectedColor,
         photoBase64: state.photoBase64,
-        customSectionNames: state.customSectionNames
+        customSectionNames: state.customSectionNames,
+        showWatermark: state.showWatermark
       })
     });
 
@@ -3910,7 +3934,8 @@ async function showPdfPreview() {
         themeName: state.selectedTheme,
         colorName: state.selectedColor,
         photoBase64: state.photoBase64,
-        customSectionNames: state.customSectionNames
+        customSectionNames: state.customSectionNames,
+        showWatermark: state.showWatermark
       })
     });
 

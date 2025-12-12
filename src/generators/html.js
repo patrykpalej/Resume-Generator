@@ -122,7 +122,7 @@ function stripProtocol(url) {
   return url.replace(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//, '');
 }
 
-function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, customSectionNames = {}) {
+function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, customSectionNames = {}, showWatermark = true) {
   if (!theme) {
     throw new Error('Theme is required to generate HTML.');
   }
@@ -280,7 +280,10 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
 ${sections}
   </div>
 
+${resumeData.gdprClause || showWatermark ? `<div class="gdpr-watermark-wrapper">
 ${resumeData.gdprClause ? `<div class="gdpr-clause">${resumeData.gdprClause}</div>` : ''}
+${showWatermark ? '<div class="watermark">Designed with <a href="https://cre8ive.cv" target="_blank" rel="noopener noreferrer">cre8ive.cv</a></div>' : ''}
+</div>` : ''}
 </body>
 </html>`;
 }

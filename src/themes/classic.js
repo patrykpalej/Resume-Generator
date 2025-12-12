@@ -322,17 +322,46 @@ function getStyles() {
       font-style: italic;
     }
 
-    .gdpr-clause {
+    .gdpr-watermark-wrapper {
       margin-top: auto;
+      margin-bottom: 0;
+      padding-bottom: 0;
+      page-break-inside: avoid;
+      page-break-before: auto;
+    }
+
+    .gdpr-clause {
       padding-top: 20px;
       border-top: 1px solid #1a1a1a;
       font-size: 10px;
       color: #4a4a4a;
       line-height: 1.4;
       text-align: justify;
-      page-break-inside: avoid;
-      page-break-before: auto;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .watermark {
+      margin-top: 0px;
+      margin-bottom: 0;
+      padding-top: 3px;
+      padding-bottom: 0;
+      font-size: 10px;
+      color: #666;
+      text-align: center;
+      font-style: italic;
+      font-weight: 400;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      letter-spacing: 0.2px;
+      line-height: 1.2;
+    }
+
+    .watermark a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .watermark a:hover {
+      text-decoration: underline;
     }
 
     @media print {
@@ -368,7 +397,7 @@ function getStyles() {
         -webkit-print-color-adjust: exact;
       }
 
-      .gdpr-clause {
+      .gdpr-watermark-wrapper {
         margin-top: auto;
         page-break-inside: avoid;
         page-break-before: auto;

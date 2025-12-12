@@ -87,9 +87,9 @@ async function generatePDF(htmlContent, outputPath) {
       const TWO_PAGE_BODY_HEIGHT = 568; // mm (2 pages minus margins)
 
       const body = document.body;
-      const gdprClause = document.querySelector('.gdpr-clause');
+      const gdprWrapper = document.querySelector('.gdpr-watermark-wrapper');
 
-      if (!gdprClause) {
+      if (!gdprWrapper) {
         return;
       }
 
@@ -108,17 +108,14 @@ async function generatePDF(htmlContent, outputPath) {
         contentWrapper.style.flex = 'none';
       }
 
-      // Temporarily hide GDPR to measure content height
-      gdprClause.style.display = 'none';
+      // Temporarily hide GDPR wrapper to measure content height
+      gdprWrapper.style.display = 'none';
       const contentHeight = body.scrollHeight;
 
-      // Show GDPR and measure total height
-      gdprClause.style.display = 'block';
-      gdprClause.style.position = 'relative';
-      gdprClause.style.margin = '0';
-      gdprClause.style.paddingTop = '20px';
-      gdprClause.style.borderTop = '1px solid #ecf0f1';
-      gdprClause.style.backgroundColor = '#fff';
+      // Show GDPR wrapper and measure total height
+      gdprWrapper.style.display = 'block';
+      gdprWrapper.style.position = 'relative';
+      gdprWrapper.style.margin = '0';
 
       const totalHeight = body.scrollHeight;
       const gdprHeight = totalHeight - contentHeight;
@@ -128,27 +125,27 @@ async function generatePDF(htmlContent, outputPath) {
 
       // Determine positioning strategy based on total content height
       if (totalHeightMm <= ONE_PAGE_THRESHOLD) {
-        // SCENARIO 1: Content fits on one page - fix GDPR at bottom of page 1
+        // SCENARIO 1: Content fits on one page - fix GDPR wrapper at bottom of page 1
         console.log(`GDPR positioning: Single page (${totalHeightMm.toFixed(0)}mm)`);
         body.style.height = ONE_PAGE_BODY_HEIGHT + 'mm';
-        gdprClause.style.position = 'absolute';
-        gdprClause.style.bottom = '0';
-        gdprClause.style.left = '0';
-        gdprClause.style.right = '0';
+        gdprWrapper.style.position = 'absolute';
+        gdprWrapper.style.bottom = '0';
+        gdprWrapper.style.left = '0';
+        gdprWrapper.style.right = '0';
       } else if (totalHeightMm <= TWO_PAGE_THRESHOLD) {
-        // SCENARIO 2: Content fits on two pages - fix GDPR at bottom of page 2
+        // SCENARIO 2: Content fits on two pages - fix GDPR wrapper at bottom of page 2
         console.log(`GDPR positioning: Two pages (${totalHeightMm.toFixed(0)}mm)`);
         body.style.height = TWO_PAGE_BODY_HEIGHT + 'mm';
-        gdprClause.style.position = 'absolute';
-        gdprClause.style.bottom = '0';
-        gdprClause.style.left = '0';
-        gdprClause.style.right = '0';
+        gdprWrapper.style.position = 'absolute';
+        gdprWrapper.style.bottom = '0';
+        gdprWrapper.style.left = '0';
+        gdprWrapper.style.right = '0';
       } else {
-        // SCENARIO 3: Content exceeds two pages - place GDPR after content (natural flow)
+        // SCENARIO 3: Content exceeds two pages - place GDPR wrapper after content (natural flow)
         console.log(`GDPR positioning: Multi-page (${totalHeightMm.toFixed(0)}mm)`);
         body.style.height = 'auto';
-        gdprClause.style.position = 'relative';
-        // GDPR will naturally flow after content
+        gdprWrapper.style.position = 'relative';
+        // GDPR wrapper will naturally flow after content
       }
     });
 
@@ -159,7 +156,7 @@ async function generatePDF(htmlContent, outputPath) {
       margin: {
         top: '20px',
         right: '20px',
-        bottom: '20px',
+        bottom: '10px',
         left: '20px'
       }
     });
