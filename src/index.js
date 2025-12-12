@@ -9,7 +9,11 @@ const { getAllColors, resolveColor } = require('./colors');
 async function loadResumeData(inputPath) {
   const resolvedPath = path.resolve(inputPath);
   const jsonContent = await fs.readFile(resolvedPath, 'utf-8');
-  return { resumeData: JSON.parse(jsonContent), resolvedPath };
+  const parsed = JSON.parse(jsonContent);
+  const meta = parsed._meta || {};
+  const resumeData = { ...parsed };
+  delete resumeData._meta;
+  return { resumeData, meta, resolvedPath };
 }
 
 async function loadPhotoBase64(customPhotoPath) {
@@ -46,7 +50,7 @@ async function ensureOutputDirs(baseOutputDir, themeName) {
   return { htmlOutputDir, pdfOutputDir };
 }
 
-async function generateSingleResume({ outputDir, themeName, colorName, resumeData, photoBase64, htmlOnly = false }) {
+async function generateSingleResume({ outputDir, themeName, colorName, resumeData, photoBase64, customSectionNames = {}, htmlOnly = false }) {
   const theme = loadTheme(themeName);
   let resolvedColorName = 'monochromatic';
   let palette;
@@ -61,7 +65,7 @@ async function generateSingleResume({ outputDir, themeName, colorName, resumeDat
   const displayColor = theme.monochromatic ? 'monochromatic' : resolvedColorName;
   console.log(`Generating: ${theme.name} / ${displayColor}`);
 
-  const htmlContent = generateHTML(resumeData, photoBase64, theme, palette);
+  const htmlContent = generateHTML(resumeData, photoBase64, theme, palette, customSectionNames);
   const fileBaseName = theme.monochromatic ? `resume_${theme.name}` : `resume_${theme.name}_${resolvedColorName}`;
 
   const htmlPath = path.join(htmlOutputDir, `${fileBaseName}.html`);
@@ -88,10 +92,16 @@ async function generateResume({
   htmlOnly = false
 }) {
   try {
-    const { resumeData, resolvedPath } = await loadResumeData(inputPath);
+    const { resumeData, meta, resolvedPath } = await loadResumeData(inputPath);
     console.log(`Using Resume data from ${resolvedPath}\n`);
 
-    const photoBase64 = await loadPhotoBase64(photoPath);
+    // Use photoBase64 from JSON _meta if available, otherwise load from file
+    let photoBase64 = meta.photoBase64 || null;
+    if (photoBase64) {
+      console.log('Photo loaded from JSON _meta\n');
+    } else {
+      photoBase64 = await loadPhotoBase64(photoPath);
+    }
     const resolvedOutputDir = path.resolve(outputDir);
     const generated = [];
 
@@ -123,6 +133,7 @@ async function generateResume({
               colorName: null,
               resumeData,
               photoBase64,
+              customSectionNames: meta.customSectionNames || {},
               htmlOnly
             })
           );
@@ -135,6 +146,7 @@ async function generateResume({
                 colorName: color,
                 resumeData,
                 photoBase64,
+                customSectionNames: meta.customSectionNames || {},
                 htmlOnly
               })
             );
@@ -159,6 +171,7 @@ async function generateResume({
         colorName,
         resumeData,
         photoBase64,
+        customSectionNames: meta.customSectionNames || {},
         htmlOnly
       });
       generated.push(result);

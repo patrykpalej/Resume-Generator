@@ -948,8 +948,8 @@ function exportToJson() {
       enabledSections: state.enabledSections,
       selectedTheme: state.selectedTheme,
       selectedColor: state.selectedColor,
-      photoBase64: state.photoBase64,
-      customSectionNames: state.customSectionNames
+      customSectionNames: state.customSectionNames,
+      photoBase64: state.photoBase64
     }
   };
 
