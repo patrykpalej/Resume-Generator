@@ -1642,7 +1642,7 @@ body {
   gap: 20px;
 }
 
-/* Summary Editor */
+/* Bio Editor */
 .summary-editor-container {
   display: flex;
   flex-direction: column;

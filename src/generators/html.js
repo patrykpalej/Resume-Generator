@@ -196,9 +196,11 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
     projects: generateProjectsSection
   };
 
+  const bio = resumeData.bio ?? resumeData.summary;
+
   // Generate sections dynamically based on JSON order
   const sections = Object.keys(resumeData)
-    .filter(key => key !== 'personalInfo' && key !== 'summary' && key !== 'projectsIntro' && sectionGenerators[key])
+    .filter(key => key !== 'personalInfo' && key !== 'bio' && key !== 'summary' && key !== 'projectsIntro' && sectionGenerators[key])
     .map(key => {
       const sectionName = getSectionName(key);
       if (key === 'projects') {
@@ -267,14 +269,14 @@ function generateHTML(resumeData, photoBase64 = null, theme, colorPalette, custo
 </head>
 <body>
   <div class="content-wrapper">
-    <header class="${resumeData.summary ? 'has-summary' : 'no-summary'}" style="--contact-grid-col1-fraction: ${contactGridCol1Fraction}; --contact-grid-col2-fraction: ${contactGridCol2Fraction};">
+    <header class="${bio ? 'has-summary' : 'no-summary'}" style="--contact-grid-col1-fraction: ${contactGridCol1Fraction}; --contact-grid-col2-fraction: ${contactGridCol2Fraction};">
       <div class="header-name">
         <h1>${isolateUserContent(personalInfo.name)}</h1>
         ${personalInfo.title ? `<div class="title">${isolateUserContent(personalInfo.title)}</div>` : ''}
       </div>
       ${hasPhoto ? `<div class="header-photo"><img src="${photoBase64}" alt="photo-image" class="profile-photo"></div>` : ''}
-      ${resumeData.summary ? `<div class="header-summary">
-        <p class="summary">${isolateUserContent(resumeData.summary)}</p>
+      ${bio ? `<div class="header-summary">
+        <p class="summary">${isolateUserContent(bio)}</p>
       </div>` : ''}
       ${hasContacts ? `<div class="header-contacts">
         <div class="contact-grid">

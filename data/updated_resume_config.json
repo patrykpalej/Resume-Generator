@@ -9,7 +9,7 @@
     "github": "https://github.com/patrykpalej",
     "location": "Cracow / Remote"
   },
-  "summary": "Python developer specializing in AI with data science and engineering background. 6+ years of experience in the industry. Passionate technical trainer with experience in various forms of education",
+  "bio": "Python developer specializing in AI with data science and engineering background. 6+ years of experience in the industry. Passionate technical trainer with experience in various forms of education",
   "skills": [
     {
       "name": "Working knowledge",
@@ -144,7 +144,7 @@
   "_meta": {
     "enabledSections": {
       "personalInfo": true,
-      "summary": true,
+      "bio": true,
       "skills": true,
       "experience": true,
       "education": true,

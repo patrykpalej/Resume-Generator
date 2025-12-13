@@ -9,7 +9,7 @@
     "github": "https://github.com/your-github",
     "location": "Your City / Country"
   },
-  "summary": "Full-stack engineer who enjoys shipping reliable web applications and collaborating across teams.",
+  "bio": "Full-stack engineer who enjoys shipping reliable web applications and collaborating across teams.",
   "skills": [
     {
       "name": "Working knowledge",
@@ -110,7 +110,7 @@
   "_meta": {
     "enabledSections": {
       "personalInfo": true,
-      "summary": true,
+      "bio": true,
       "skills": true,
       "experience": true,
       "education": true,

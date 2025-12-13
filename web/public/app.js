@@ -19,8 +19,8 @@ const state = {
 };
 
 // Section configuration
-const ALL_SECTIONS = ['personalInfo', 'summary', 'skills', 'experience', 'education', 'projects', 'gdprClause'];
-const FIXED_SECTIONS = ['personalInfo', 'summary', 'gdprClause']; // Cannot be reordered (fixed positions)
+const ALL_SECTIONS = ['personalInfo', 'bio', 'skills', 'experience', 'education', 'projects', 'gdprClause'];
+const FIXED_SECTIONS = ['personalInfo', 'bio', 'gdprClause']; // Cannot be reordered (fixed positions)
 const REQUIRED_SECTIONS = ['personalInfo']; // Cannot be disabled
 const REORDERABLE_SECTIONS = ['skills', 'experience', 'education', 'projects']; // Can be reordered
 const MIN_SKILL_FRACTION = 0.5;
@@ -149,7 +149,7 @@ const elements = {
   piLinkedin: document.getElementById('piLinkedin'),
   piGithub: document.getElementById('piGithub'),
   piLocation: document.getElementById('piLocation'),
-  // Summary Modal
+  // Bio Modal
   summaryModal: document.getElementById('summaryModal'),
   summaryTextarea: document.getElementById('summaryTextarea'),
   summaryFormError: document.getElementById('summaryFormError'),
@@ -169,6 +169,37 @@ const elements = {
 
 // LocalStorage persistence functions
 const STORAGE_KEY = 'resumeGenerator';
+
+// Normalize legacy data that used the "summary" key to the new "bio" key
+function migrateSummaryToBio(resumeData, enabledSections, customSectionNames) {
+  let changed = false;
+
+  if (resumeData && Object.prototype.hasOwnProperty.call(resumeData, 'summary')) {
+    if (!Object.prototype.hasOwnProperty.call(resumeData, 'bio')) {
+      resumeData.bio = resumeData.summary;
+    }
+    delete resumeData.summary;
+    changed = true;
+  }
+
+  if (enabledSections && Object.prototype.hasOwnProperty.call(enabledSections, 'summary')) {
+    if (!Object.prototype.hasOwnProperty.call(enabledSections, 'bio')) {
+      enabledSections.bio = enabledSections.summary;
+    }
+    delete enabledSections.summary;
+    changed = true;
+  }
+
+  if (customSectionNames && Object.prototype.hasOwnProperty.call(customSectionNames, 'summary')) {
+    if (!Object.prototype.hasOwnProperty.call(customSectionNames, 'bio')) {
+      customSectionNames.bio = customSectionNames.summary;
+    }
+    delete customSectionNames.summary;
+    changed = true;
+  }
+
+  return changed;
+}
 
 function saveStateToLocalStorage() {
   try {
@@ -216,9 +247,13 @@ function loadStateFromLocalStorage() {
     state.showWatermark = parsedData.showWatermark !== undefined ? parsedData.showWatermark : true;
     state.templateLoaded = parsedData.templateLoaded || false;
 
+    // Migrate legacy "summary" section to "bio"
+    migrateSummaryToBio(state.resumeData, state.enabledSections, state.customSectionNames);
+
     // Update UI
     if (state.resumeData) {
       elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+      syncEnabledSectionsWithData(state.resumeData);
       updateSectionManagementUI();
     }
 
@@ -451,7 +486,7 @@ function setupEventListeners() {
   elements.cancelPersonalInfoBtn.addEventListener('click', closePersonalInfoModal);
   elements.savePersonalInfoBtn.addEventListener('click', savePersonalInfoForm);
 
-  // Summary modal event listeners
+  // Bio modal event listeners
   elements.closeSummaryModalBtn.addEventListener('click', closeSummaryModal);
   elements.cancelSummaryBtn.addEventListener('click', closeSummaryModal);
   elements.saveSummaryBtn.addEventListener('click', saveSummaryForm);
@@ -660,6 +695,8 @@ async function loadExampleData() {
     const data = { ...rawData };
     delete data._meta;
 
+    migrateSummaryToBio(data, meta?.enabledSections, meta?.customSectionNames);
+
     elements.jsonEditor.value = JSON.stringify(data, null, 2);
     state.resumeData = data;
 
@@ -667,6 +704,7 @@ async function loadExampleData() {
     initializeEnabledSections(data);
     if (meta?.enabledSections) {
       state.enabledSections = { ...meta.enabledSections };
+      migrateSummaryToBio(null, state.enabledSections);
     }
 
     // Apply optional metadata (theme/color/photo/custom names/watermark)
@@ -707,6 +745,8 @@ async function handleFileUpload(event) {
       const data = { ...parsed };
       delete data._meta;
 
+      migrateSummaryToBio(data, meta?.enabledSections, meta?.customSectionNames);
+
       elements.jsonEditor.value = JSON.stringify(data, null, 2);
       state.resumeData = data;
 
@@ -714,6 +754,7 @@ async function handleFileUpload(event) {
       initializeEnabledSections(data);
       if (meta?.enabledSections) {
         state.enabledSections = { ...meta.enabledSections };
+        migrateSummaryToBio(null, state.enabledSections);
       }
 
       // Apply meta settings (theme/color/photo/customSectionNames)
@@ -751,15 +792,77 @@ function initializeEnabledSections(data) {
   });
 }
 
+// Ensure enabledSections has entries for all known sections without overwriting existing user choices
+function syncEnabledSectionsWithData(data) {
+  if (!data) return;
+  ALL_SECTIONS.forEach(section => {
+    if (state.enabledSections[section] === undefined) {
+      state.enabledSections[section] = data[section] !== undefined;
+    }
+  });
+}
+
+// Resize image proportionally before converting to base64
+// Fills transparent backgrounds with white to match resume background
+async function resizeImage(file, maxWidth = 400, maxHeight = 400) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // Calculate new dimensions while maintaining aspect ratio
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        // Create canvas to resize the image
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        // Fill with white background first (matches resume background color)
+        // This ensures transparent areas in PNGs become white instead of black
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+
+        // Draw resized image on top of white background
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to base64 as JPEG (no transparency support, uses white background)
+        const resizedBase64 = canvas.toDataURL('image/jpeg', 0.9);
+        resolve(resizedBase64);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 // Handle photo upload
 async function handlePhotoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    state.photoBase64 = e.target.result;
-    flashPreviewStatus(`Photo uploaded: ${file.name}`, 'status-success');
+  try {
+    // Resize image before storing as base64
+    const resizedBase64 = await resizeImage(file);
+    state.photoBase64 = resizedBase64;
+
+    flashPreviewStatus(`Photo uploaded and resized: ${file.name}`, 'status-success');
 
     // Update UI to show remove button
     updatePhotoButtonState(true);
@@ -769,8 +872,10 @@ async function handlePhotoUpload(event) {
 
     // Save to localStorage
     saveStateToLocalStorage();
-  };
-  reader.readAsDataURL(file);
+  } catch (error) {
+    console.error('Error uploading photo:', error);
+    flashPreviewStatus('Failed to upload photo', 'status-error');
+  }
 }
 
 // Handle photo removal
@@ -819,7 +924,13 @@ function validateJson() {
   }
 
   try {
-    state.resumeData = JSON.parse(jsonText);
+    const parsed = JSON.parse(jsonText);
+    const migrated = migrateSummaryToBio(parsed, state.enabledSections, state.customSectionNames);
+    state.resumeData = parsed;
+    syncEnabledSectionsWithData(parsed);
+    if (migrated) {
+      elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
+    }
     updateButtonStates();
     return true;
   } catch (error) {
@@ -1052,6 +1163,7 @@ function applyMetaSettings(meta) {
   // Apply custom section names if available
   if (meta.customSectionNames) {
     state.customSectionNames = { ...meta.customSectionNames };
+    migrateSummaryToBio(null, null, state.customSectionNames);
   }
 
   // Apply watermark setting (default to true if not specified)
@@ -1660,7 +1772,7 @@ function updateSectionManagementUI() {
         openExperienceManagementModal();
       } else if (sectionKey === 'personalInfo') {
         openPersonalInfoModal();
-      } else if (sectionKey === 'summary') {
+      } else if (sectionKey === 'bio') {
         openSummaryModal();
       } else if (sectionKey === 'gdprClause') {
         openGdprModal();
@@ -1701,6 +1813,7 @@ function handleSectionToggle(sectionKey, enabled) {
 function getSectionIcon(section) {
   const icons = {
     personalInfo: 'fas fa-user',
+    bio: 'fas fa-align-left',
     summary: 'fas fa-align-left',
     skills: 'fas fa-lightbulb',
     experience: 'fas fa-briefcase',
@@ -1721,7 +1834,8 @@ function getSectionDisplayName(section) {
   // Fall back to default names
   const names = {
     personalInfo: 'Personal Information',
-    summary: 'Summary',
+    bio: 'Bio',
+    summary: 'Bio',
     skills: 'Skills & Languages',
     experience: 'Experience',
     education: 'Education',
@@ -2050,7 +2164,8 @@ function updateSectionNameInModals(sectionKey, newName) {
 function getDefaultSectionName(section) {
   const names = {
     personalInfo: 'Personal Information',
-    summary: 'Summary',
+    bio: 'Bio',
+    summary: 'Bio',
     skills: 'Skills & Languages',
     experience: 'Experience',
     education: 'Education',
@@ -2122,8 +2237,12 @@ function handleDrop(e) {
 
   if (!draggedItem) return false;
 
-  // Update JSON based on new order
-  updateJsonOrder();
+  // Capture the current DOM order BEFORE any rebuilds
+  const items = elements.sectionList.querySelectorAll('.section-item');
+  const finalOrder = Array.from(items).map(item => item.dataset.section);
+
+  // Update JSON based on the captured order
+  updateJsonOrder(finalOrder);
 
   return false;
 }
@@ -2152,11 +2271,19 @@ function getDragAfterElement(container, y) {
   }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
-function updateJsonOrder() {
+function updateJsonOrder(providedOrder = null) {
   try {
     const data = state.resumeData;
-    const items = elements.sectionList.querySelectorAll('.section-item');
-    const currentOrder = Array.from(items).map(item => item.dataset.section);
+
+    let currentOrder;
+    if (providedOrder) {
+      // Use the provided order (captured at drop time)
+      currentOrder = providedOrder;
+    } else {
+      // Fallback to reading from DOM (for backward compatibility)
+      const items = elements.sectionList.querySelectorAll('.section-item');
+      currentOrder = Array.from(items).map(item => item.dataset.section === 'summary' ? 'bio' : item.dataset.section);
+    }
 
     // Extract only reorderable sections from current order
     const reorderableSectionsOrder = currentOrder.filter(key => REORDERABLE_SECTIONS.includes(key));
@@ -2169,9 +2296,10 @@ function updateJsonOrder() {
       newData.personalInfo = data.personalInfo;
     }
 
-    // 2. Always put summary second if it exists
-    if (data.summary !== undefined) {
-      newData.summary = data.summary;
+    // 2. Always put bio second if it exists (fallback to legacy summary)
+    const bio = data.bio !== undefined ? data.bio : data.summary;
+    if (bio !== undefined) {
+      newData.bio = bio;
     }
 
     // 3. Add reorderable sections in their new order
@@ -2183,7 +2311,7 @@ function updateJsonOrder() {
 
     // 4. Add any other non-fixed, non-reorderable keys
     Object.keys(data).forEach(key => {
-      if (!newData[key] && key !== 'gdprClause') {
+      if (!newData[key] && key !== 'gdprClause' && key !== 'summary') {
         newData[key] = data[key];
       }
     });
@@ -3847,11 +3975,11 @@ function saveGdprForm() {
   saveStateToLocalStorage();
 }
 
-// Summary Modal Functions
+// Bio Modal Functions
 function openSummaryModal() {
-  // Populate textarea with current summary
-  const summary = state.resumeData?.summary || '';
-  elements.summaryTextarea.value = summary;
+  // Populate textarea with current bio (fallback to legacy summary)
+  const bio = state.resumeData?.bio ?? state.resumeData?.summary ?? '';
+  elements.summaryTextarea.value = bio;
 
   // Hide any previous errors
   hideSummaryFormError();
@@ -3882,16 +4010,21 @@ function hideSummaryFormError() {
 function saveSummaryForm() {
   hideSummaryFormError();
 
-  const summary = elements.summaryTextarea.value.trim();
+  const bio = elements.summaryTextarea.value.trim();
 
-  // Summary can be empty - user might want to remove it
+  if (!state.resumeData) {
+    state.resumeData = {};
+  }
+
+  // Bio can be empty - user might want to remove it
   // Update state
-  if (summary) {
-    state.resumeData.summary = summary;
+  if (bio) {
+    state.resumeData.bio = bio;
   } else {
     // If empty, keep the key but with empty string
-    state.resumeData.summary = '';
+    state.resumeData.bio = '';
   }
+  delete state.resumeData.summary;
 
   // Update hidden JSON editor
   elements.jsonEditor.value = JSON.stringify(state.resumeData, null, 2);
@@ -3903,7 +4036,7 @@ function saveSummaryForm() {
 
   // Update UI and preview
   updateSectionManagementUI();
-  flashPreviewStatus('Summary updated successfully', 'status-success');
+  flashPreviewStatus('Bio updated successfully', 'status-success');
   autoGeneratePreview('section-edit');
 
   // Save to localStorage

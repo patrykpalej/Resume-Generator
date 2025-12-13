@@ -9,7 +9,7 @@
     "github": "https://github.com/patrykpalej",
     "location": ""
   },
-  "summary": "You are about to use <strong>cre8ive.cv</strong> – a tool for generating a <strong>customizable</strong> and <strong>easily editable</strong> resume. Its data layer is a pure <strong>JSON</strong> which can be exported and reimported (including photo in base64). The generator supports export to PDF format. You can use a variety of themes and colors. The app <strong>respects your privacy</strong> – no personal data is stored on the server side after rendering your JSON to PDF. For extra security you can also self-host it on your own local machine.<br>Below you can find the project author’s contact information.",
+  "bio": "You are about to use <strong>cre8ive.cv</strong> – a tool for generating a <strong>customizable</strong> and <strong>easily editable</strong> resume. Its data layer is a pure <strong>JSON</strong> which can be exported and reimported (including photo in base64). The generator supports export to PDF format. You can use a variety of themes and colors. The app <strong>respects your privacy</strong> – no personal data is stored on the server side after rendering your JSON to PDF. For extra security you can also self-host it on your own local machine.<br>Below you can find the project author’s contact information.",
   "skills": [
     {
       "name": "Working knowledge",
