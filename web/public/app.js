@@ -2338,7 +2338,7 @@ function populateSkillsList() {
             <i class="fas fa-edit"></i> Edit
           </button>
           <button class="btn btn-danger btn-small" onclick="deleteSkill(${index})">
-            <i class="fas fa-trash"></i>
+            <i class="fas fa-trash-alt"></i>
           </button>
         </div>
       </div>
@@ -2515,7 +2515,7 @@ function addSkillItemField(text = '') {
   item.innerHTML = `
     <input type="text" value="${safeValue}" placeholder="e.g., React, Docker, English (C1)">
     <button type="button" class="btn-icon" onclick="removeSkillItem(this)" title="Remove">
-      <i class="fas fa-trash"></i>
+      <i class="fas fa-trash-alt"></i>
     </button>
   `;
   elements.skillItemsList.appendChild(item);
@@ -2681,7 +2681,7 @@ function populateProjectsList() {
           <i class="fas fa-edit"></i> Edit
         </button>
         <button class="btn btn-danger btn-small" onclick="deleteProject(${index})">
-          <i class="fas fa-trash"></i>
+          <i class="fas fa-trash-alt"></i>
         </button>
       </div>
     </div>
@@ -2906,7 +2906,7 @@ function populateEducationList() {
             <i class="fas fa-edit"></i> Edit
           </button>
           <button class="btn btn-danger btn-small" onclick="deleteEducation(${index})">
-            <i class="fas fa-trash"></i>
+            <i class="fas fa-trash-alt"></i>
           </button>
         </div>
       </div>
@@ -2963,7 +2963,7 @@ function populateExperienceList() {
             <i class="fas fa-edit"></i> Edit
           </button>
           <button class="btn btn-danger btn-small" onclick="deleteExperience(${index})">
-            <i class="fas fa-trash"></i>
+            <i class="fas fa-trash-alt"></i>
           </button>
         </div>
       </div>
@@ -3416,7 +3416,7 @@ function addResponsibilityField(text = '') {
   item.innerHTML = `
     <input type="text" value="${text || ''}" placeholder="Describe a responsibility or achievement..." />
     <button type="button" class="btn-icon" onclick="removeResponsibility(this)" title="Remove">
-      <i class="fas fa-trash"></i>
+      <i class="fas fa-trash-alt"></i>
     </button>
   `;
   elements.responsibilitiesList.appendChild(item);
