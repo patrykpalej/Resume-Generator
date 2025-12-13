@@ -1,0 +1,103 @@
+{
+  "personalInfo": {
+    "name": "🔥 Welcome to <span style='background:linear-gradient(90deg,#ff3b00,#ff8c1a,#ffcc33);-webkit-background-clip:text;color:transparent'>cre8ive.cv</span>",
+    "title": "JSON oriented resume generator for IT professionals",
+    "email": "feedback@cre8ive.cv",
+    "phone": "",
+    "website": "https://palej.dev",
+    "linkedin": "https://linkedin.com/in/patryk-palej",
+    "github": "https://github.com/patrykpalej",
+    "location": ""
+  },
+  "summary": "You are about to use <strong>cre8ive.cv</strong> – a tool for generating a <strong>customizable</strong> and <strong>easily editable</strong> resume. Its data layer is a pure <strong>JSON</strong> which can be exported and reimported (including photo in base64). The generator supports export to PDF format. You can use a variety of themes and colors. The app <strong>respects your privacy</strong> – no personal data is stored on the server side after rendering your JSON to PDF. For extra security you can also self-host it on your own local machine.<br>Below you can find the project author’s contact information.",
+  "skills": [
+    {
+      "name": "Working knowledge",
+      "fraction": 2.5,
+      "items": [
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "Node.js",
+        "Express",
+        "SQL",
+        "REST APIs",
+        "Git",
+        "Linux"
+      ]
+    },
+    {
+      "name": "Basic skills",
+      "fraction": 2,
+      "items": [
+        "Docker",
+        "Cloud basics",
+        "Python",
+        "Testing (Jest, Playwright)"
+      ]
+    },
+    {
+      "name": "Languages",
+      "fraction": 1,
+      "items": [
+        "English (C1)",
+        "Spanish (B2)"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "position": "Software Engineer",
+      "company": "Acme Corp",
+      "startDate": "2022-06",
+      "endDate": null,
+      "responsibilities": [
+        "Built and maintained React frontends backed by Node.js services",
+        "Improved API performance and added request tracing",
+        "Mentored interns on code quality and delivery practices"
+      ]
+    },
+    {
+      "position": "Junior Developer",
+      "company": "Tech Solutions",
+      "startDate": "2020-01",
+      "endDate": "2022-05",
+      "responsibilities": [
+        "Implemented UI features and bug fixes in a customer dashboard",
+        "Wrote integration tests for critical user flows",
+        "Collaborated with designers to refine UX details"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Computer Science",
+      "level": "Master studies",
+      "institution": "State University",
+      "startDate": "2017-10",
+      "graduationDate": "2019-07"
+    },
+    {
+      "degree": "Physics",
+      "level": "Bachelor studies",
+      "institution": "State University",
+      "startDate": "2014-10",
+      "graduationDate": "2017-07"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Portfolio Site",
+      "description": "Personal website showcasing projects and writing.",
+      "technologies": ["Next.js", "Tailwind CSS"],
+      "link": "https://example.org"
+    },
+    {
+      "name": "Task Tracker API",
+      "description": "REST API for managing tasks with authentication and metrics.",
+      "technologies": ["Node.js", "Express", "PostgreSQL"],
+      "link": "https://example.org"
+    }
+  ],
+  "gdprClause": "I agree to the processing of personal data provided in this document for realising the recruitment process pursuant to the Personal Data Protection Act of 10 May 2018 (Journal of Laws 2018, item 1000) and in agreement with Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (General Data Protection Regulation)."
+}

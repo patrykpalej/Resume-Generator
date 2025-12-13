@@ -235,9 +235,11 @@ function loadStateFromLocalStorage() {
       const selectedThemeObj = state.themes.find(t => t.name === state.selectedTheme);
       if (selectedThemeObj) {
         if (selectedThemeObj.monochromatic) {
-          elements.colorGroup.style.display = 'none';
+          elements.colorGroup.style.visibility = 'hidden';
+          elements.colorGroup.style.pointerEvents = 'none';
         } else {
-          elements.colorGroup.style.display = 'block';
+          elements.colorGroup.style.visibility = 'visible';
+          elements.colorGroup.style.pointerEvents = 'auto';
         }
       }
     }
@@ -322,7 +324,8 @@ async function loadThemes() {
 
       // Show color selector if default theme is not monochromatic
       if (!defaultTheme.monochromatic) {
-        elements.colorGroup.style.display = 'block';
+        elements.colorGroup.style.visibility = 'visible';
+        elements.colorGroup.style.pointerEvents = 'auto';
       }
     }
 
@@ -652,28 +655,22 @@ function clearResumeData() {
 async function loadExampleData() {
   try {
     const response = await fetch('/api/example-data');
-    const data = await response.json();
+    const rawData = await response.json();
+    const meta = rawData._meta || null;
+    const data = { ...rawData };
+    delete data._meta;
+
     elements.jsonEditor.value = JSON.stringify(data, null, 2);
     state.resumeData = data;
 
     // Initialize all sections as enabled
     initializeEnabledSections(data);
-
-    // Load default photo
-    try {
-      const photoResponse = await fetch('/assets/avatar.png');
-      const photoBlob = await photoResponse.blob();
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        state.photoBase64 = reader.result;
-        updatePhotoButtonState(true);
-        await autoGeneratePreview('photo');
-        saveStateToLocalStorage();
-      };
-      reader.readAsDataURL(photoBlob);
-    } catch (photoError) {
-      console.error('Error loading default photo:', photoError);
+    if (meta?.enabledSections) {
+      state.enabledSections = { ...meta.enabledSections };
     }
+
+    // Apply optional metadata (theme/color/photo/custom names/watermark)
+    applyMetaSettings(meta);
 
     flashPreviewStatus('Example data loaded successfully', 'status-success');
 
@@ -842,11 +839,13 @@ async function handleThemeChange(event) {
     const isMonochromatic = selectedOption.dataset.monochromatic === 'true';
 
     if (isMonochromatic) {
-      elements.colorGroup.style.display = 'none';
+      elements.colorGroup.style.visibility = 'hidden';
+      elements.colorGroup.style.pointerEvents = 'none';
       state.selectedColor = null;
       elements.colorSelect.value = '';
     } else {
-      elements.colorGroup.style.display = 'block';
+      elements.colorGroup.style.visibility = 'visible';
+      elements.colorGroup.style.pointerEvents = 'auto';
       // Default to blue when switching from mono to colorful themes
       if (!state.selectedColor && state.colors.includes('blue')) {
         state.selectedColor = 'blue';
@@ -854,7 +853,8 @@ async function handleThemeChange(event) {
       }
     }
   } else {
-    elements.colorGroup.style.display = 'none';
+    elements.colorGroup.style.visibility = 'hidden';
+    elements.colorGroup.style.pointerEvents = 'none';
     state.selectedColor = null;
   }
 
@@ -1025,7 +1025,13 @@ function applyMetaSettings(meta) {
       elements.themeSelect.value = meta.selectedTheme;
 
       const isMonochromatic = theme.monochromatic;
-      elements.colorGroup.style.display = isMonochromatic ? 'none' : 'block';
+      if (isMonochromatic) {
+        elements.colorGroup.style.visibility = 'hidden';
+        elements.colorGroup.style.pointerEvents = 'none';
+      } else {
+        elements.colorGroup.style.visibility = 'visible';
+        elements.colorGroup.style.pointerEvents = 'auto';
+      }
 
       if (!isMonochromatic && meta.selectedColor && state.colors.includes(meta.selectedColor)) {
         state.selectedColor = meta.selectedColor;

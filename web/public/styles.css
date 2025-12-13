@@ -477,6 +477,7 @@ body {
   letter-spacing: 0.5px;
   color: var(--text-secondary);
   margin-bottom: 4px;
+  padding-left: 12px;
   flex-shrink: 0;
 }
 
@@ -617,6 +618,8 @@ body {
   gap: 6px;
   align-items: flex-start;
   width: 100%;
+  min-height: 63px; /* Reserve space for label: 12px (label height) + 6px (gap) + 44px (button) + 1px buffer */
+  justify-content: flex-end;
 }
 
 .button-group .btn,
@@ -753,6 +756,8 @@ body {
   flex-direction: column;
   gap: 6px;
   width: 100%;
+  min-height: 63px; /* Match button-with-label height for consistent alignment */
+  justify-content: flex-end;
 }
 
 .photo-remove-btn {
